@@ -1,0 +1,90 @@
+from actor import *
+from utils import *
+
+class Interactions(object):
+	def get(self, interaction):
+		return getattr(self, interaction)
+
+	def touch(self, aA, aB):
+		if aA.getAttribute('x') is aB.getAttribute('x') and aA.getAttribute('y') is aB.getAttribute('y'):
+			return True
+		else:
+			return False
+
+	def near(self, aA, aB):
+		dist = 50
+		half_dist = dist/2
+		# Here we expand the boxes for the actors by half dist in each direction
+		# This may very well move the rect up to the left a half_dist
+		if isinstance(aA, Actor):
+			aAxy = [aA.getAttribute('x')-half_dist, aA.getAttribute('y')-half_dist, aA.getAttribute('w')+half_dist, aA.getAttribute('h')+half_dist]
+		else:
+			aAxy = aA
+			aAxy[0] -= half_dist
+			aAxy[1] -= half_dist
+			aAxy[2] += half_dist
+			aAxy[3] += half_dist
+
+		if isinstance(aB, Actor):
+			aBxy = [aB.getAttribute('x')-half_dist, aB.getAttribute('y')-half_dist, aB.getAttribute('w')+half_dist, aB.getAttribute('h')+half_dist]
+		else:
+			aBxy = aB
+			aBxy[0] -= half_dist
+			aBxy[1] -= half_dist
+			aBxy[2] += half_dist
+			aBxy[3] += half_dist
+
+		aAcenter = [aAxy[0] + (aAxy[2]/2), aAxy[1] + (aAxy[3]/2)]
+		aBcenter = [aBxy[0] + (aBxy[2]/2), aBxy[1] + (aBxy[3]/2)]
+
+		aAradius = utils.distance(aAcenter, aBxy)
+		aBradius = utils.distance(aBcenter, aBxy)
+
+		maxDistance = aAradius + aBradius
+		distance = utils.distance(aAcenter, aBcenter)
+
+		if maxDistance >= distance:
+			return True
+		else:
+			return False
+
+	def over(self, aA, aB, return_difference=False):
+		if isinstance(aA, Actor):
+			aAxy = utils.actorToList(aA)
+		else:
+			aAxy = aA
+
+		if isinstance(aB, Actor):
+			aBxy = utils.actorToList(aA)
+		else:
+			aBxy = aB
+
+		aABox = [
+				xrange(aAxy[0], aAxy[0]+aAxy[2]),
+				xrange(aAxy[1], aAxy[1]+aAxy[3])
+		]
+
+		aBBox = [
+				xrange(aBxy[0], aBxy[0]+aBxy[2]),
+				xrange(aBxy[1], aBxy[1]+aBxy[3])
+		]
+
+		xOver = xrange(max(aABox[0][0], aBBox[0][0]), min(aABox[0][-1], aBBox[0][-1])+1)
+		yOver = xrange(max(aABox[1][0], aBBox[1][0]), min(aABox[1][-1], aBBox[1][-1])+1)
+
+		is_over = bool(xOver) and bool(yOver)
+
+		if return_difference:
+			return is_over, [len(xOver), len(yOver)]
+		else:
+			return is_over
+
+	def under(self, aA, aB):
+		x_range = range(aA.getAttribute('x'), aA.getAttribute('x')+aA.getAttribute('w'))
+		y_range = range(aA.getAttribute('y'), aA.getAttribute('y')+aA.getAttribute('h'))
+		b_center = [
+			aB.getAttribute('x') + (aB.getAttribute('w')/2),
+			aB.getAttribute('y') + (aB.getAttribute('h')/2),
+		]
+		return b_center[0] in x_range and b_center[1] in y_range
+interactions = Interactions()
