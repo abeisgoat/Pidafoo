@@ -1,4 +1,4 @@
 Pidafoo
 =======
 
-A free and open-source Python game engine built around PyGame
+A free and open-source 2D game engine built around PyGame.

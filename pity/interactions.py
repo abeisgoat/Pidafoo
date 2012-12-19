@@ -12,27 +12,27 @@ class Interactions(object):
 			return False
 
 	def near(self, aA, aB):
-		dist = 50
+		dist = 0
 		half_dist = dist/2
 		# Here we expand the boxes for the actors by half dist in each direction
 		# This may very well move the rect up to the left a half_dist
 		if isinstance(aA, Actor):
 			aAxy = [aA.getAttribute('x')-half_dist, aA.getAttribute('y')-half_dist, aA.getAttribute('w')+half_dist, aA.getAttribute('h')+half_dist]
 		else:
-			aAxy = aA
-			aAxy[0] -= half_dist
-			aAxy[1] -= half_dist
-			aAxy[2] += half_dist
-			aAxy[3] += half_dist
+			aAxy = [0, 0, 0, 0]
+			aAxy[0] = aA[0] - half_dist
+			aAxy[1] = aA[1] - half_dist
+			aAxy[2] = aA[2] + half_dist
+			aAxy[3] = aA[3] + half_dist
 
 		if isinstance(aB, Actor):
 			aBxy = [aB.getAttribute('x')-half_dist, aB.getAttribute('y')-half_dist, aB.getAttribute('w')+half_dist, aB.getAttribute('h')+half_dist]
 		else:
-			aBxy = aB
-			aBxy[0] -= half_dist
-			aBxy[1] -= half_dist
-			aBxy[2] += half_dist
-			aBxy[3] += half_dist
+			aBxy = [0, 0, 0, 0]
+			aBxy[0] = aB[0] - half_dist
+			aBxy[1] = aB[1] - half_dist
+			aBxy[2] = aB[2] + half_dist
+			aBxy[3] = aB[3] + half_dist
 
 		aAcenter = [aAxy[0] + (aAxy[2]/2), aAxy[1] + (aAxy[3]/2)]
 		aBcenter = [aBxy[0] + (aBxy[2]/2), aBxy[1] + (aBxy[3]/2)]
@@ -44,11 +44,17 @@ class Interactions(object):
 		distance = utils.distance(aAcenter, aBcenter)
 
 		if maxDistance >= distance:
+			#print maxDistance, distance, aAcenter, aBcenter
 			return True
 		else:
 			return False
 
 	def over(self, aA, aB, return_difference=False):
+		near = self.near(aA, aB)
+		if not near: 
+			print 'near'
+			return False
+
 		if isinstance(aA, Actor):
 			aAxy = utils.actorToList(aA)
 		else:
