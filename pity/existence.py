@@ -32,6 +32,10 @@ class Existence(Bindable):
 		self.__selectors_cache__ = {}
 
 	def loadActors(self):
+		for actorID,actor in self.map.getExpiredActors().items():
+			if self.hasActor(actorID):
+				self.removeActor(actor)
+
 		for actorID in self.map.getActors():
 			actor = self.map.getActor(actorID)
 			if not self.hasActor(actorID):
@@ -130,9 +134,9 @@ class Existence(Bindable):
 	def removeActor(self, actor):
 		self.trigger('remove actor')
 		if actor.id in self.actors:
-			self.actors.pop(actor.id)
+			print 'Removed %s' % self.actors.pop(actor.id).id
 		else:
-			raise Exception('Actor with id %s not resent in existence' % actor.id)
+			raise Exception('Actor with id %s not present in existence' % actor.id)
 
 	def getActor(self, actorID):
 		try:

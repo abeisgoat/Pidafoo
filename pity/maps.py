@@ -8,11 +8,12 @@ class Map(object):
 	def __init__(self, gridset=None, blocks=None):
 
 		self.chunkRangeActors = {}
+		self.expiredChunkRangeActors = {}
 		self.allActors = {}
 		self.blockSize = 32
 		self.chunkSize = 10
-		self.activeChunkX = 0
-		self.activeChunkY = 0
+		self.activeChunkX = -1
+		self.activeChunkY = -1
 		self.chunkRange = 1
 
 		if gridset:
@@ -144,10 +145,13 @@ class Map(object):
 		self.updateChunkRangeActors()
 
 	def updateChunkRangeActors(self):
+		self.expiredChunkRangeActors = dict(**self.chunkRangeActors)
 		actors = {}
+		rangeChunks = 0
 		for x in range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1):
 			for y in range(self.activeChunkY-self.chunkRange, self.activeChunkY+self.chunkRange+1):
 				if x >= 0 and y >= 0 and x < len(self.actors[0].keys()) and y < len(self.actors):
+					rangeChunks += 1
 					actors.update(self.actors[y][x])
 		self.chunkRangeActors = actors
 
@@ -157,6 +161,7 @@ class Map(object):
 	def removeActor(self, actor, chunkX=None, chunkY=None):
 		if not chunkX: chunkX = self.activeChunkX
 		if not chunkY: chunkY = self.activeChunkY
+		# This errors out when the player is on the edge of a chunk passing onto an item pickup
 		self.actors[chunkY][chunkX].pop(actor.id)
 
 	def getActor(self, actorID, chunkX=None, chunkY=None):
@@ -164,5 +169,8 @@ class Map(object):
 		if not chunkY: chunkY = self.activeChunkY
 		return self.chunkRangeActors[actorID]
 
-	def getActorFixed(self, fixed, actorID):
+	def getFixedActors(self, fixed, actorID):
 		return self.actorsFixed[fixed][actorID]
+
+	def getExpiredActors(self):
+		return self.expiredChunkRangeActors
