@@ -6,6 +6,15 @@ import sys, os
 
 class Map(object):
 	def __init__(self, gridset=None, blocks=None):
+
+		self.chunkRangeActors = {}
+		self.allActors = {}
+		self.blockSize = 32
+		self.chunkSize = 10
+		self.activeChunkX = 0
+		self.activeChunkY = 0
+		self.chunkRange = 1
+
 		if gridset:
 			self.loadGridset(gridset)
 		else:
@@ -13,7 +22,6 @@ class Map(object):
 		self.actors = {}
 		self.actorsFixed = {}
 
-		self.blockSize = 32
 		if blocks:
 			self.blocks = blocks
 		else:
@@ -25,13 +33,28 @@ class Map(object):
 				grid = Grid(gridset[layer])
 			else:
 				grid = gridset[layer]
-			# Gross hack to make map draw right
-			grid.appendRow([0 for i in range(0, len(grid.getArray()[0]))])
-			self.actors.update(self.gridToActors(grid, layer=layer))
+
+			chunks = grid.split([self.chunkSize, self.chunkSize])
+
+			print "Broke map into %s chunks" % len(chunks)
+
+			for r, chunksRow in enumerate(chunks):
+				row = self.actors.get(r, {})
+				for ch,chunk in enumerate(chunksRow):
+					actors = row.get(ch, {})
+					# Gross hack to make map draw right
+					chunk.appendRow([0 for i in range(0, len(grid.getArray()[0]))])
+					chunkActors = self.gridToActors(chunk, layer=layer, prefix='Block-Chunk%ix%i' % (r, ch), offset=[ch*chunk.height*self.blockSize, r*chunk.width*self.blockSize])
+					actors.update(chunkActors)
+					self.allActors.update(chunkActors)
+					row[ch] = actors
+				self.actors[r] = row
 
 		print 'Map has %i actors' % len(self.actors)
 		
-	def gridToActors(self, grid, layer=0, prefix='Block', actorType=None):
+	def gridToActors(self, grid, layer=0, prefix='Block', actorType=None, offset=None):
+		if not offset:
+			offset = [0, 0]
 		actors = {}
 		if not actorType:
 			actorType = Actor
@@ -39,10 +62,10 @@ class Map(object):
 			for x,block in enumerate( row ):
 				aid = prefix + '-%ix%ix%i' % (x, y, int(layer))
 
-				if block in self.actors:
-					self.actors.pop(block)
+				#if block in self.actors:
+				#	self.actors.pop(block)
 
-				if block:
+				if block > 0:
 					aBlock = actorType(aid)
 
 					w = 0
@@ -71,8 +94,9 @@ class Map(object):
 
 					aBlock.setAttribute('w', w*self.blockSize)
 					aBlock.setAttribute('h', h*self.blockSize)
-					aBlock.setAttribute('x', x*self.blockSize)
-					aBlock.setAttribute('y', y*self.blockSize)
+					aBlock.setAttribute('x', x*self.blockSize+ offset[0])
+					aBlock.setAttribute('y', y*self.blockSize+ offset[1])
+
 					aBlock.setAttribute('solid', self.blocks[block].solid)
 					aBlock.setAttribute('color', self.blocks[block].color)
 					aBlock.setAttribute('group', self.blocks[block].group)
@@ -112,13 +136,33 @@ class Map(object):
 		return actors
 
 	def getActors(self):
-		return self.actors
+		return self.chunkRangeActors
 
-	def removeActor(self, actor):
-		self.actors.pop(actor.id)
+	def setActiveChunk(self, x=0, y=0):
+		self.activeChunkX = x
+		self.activeChunkY = y
+		self.updateChunkRangeActors()
 
-	def getActor(self, actorID):
-		return self.actors[actorID]
+	def updateChunkRangeActors(self):
+		actors = {}
+		for x in range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1):
+			for y in range(self.activeChunkY-self.chunkRange, self.activeChunkY+self.chunkRange+1):
+				if x >= 0 and y >= 0 and x < len(self.actors[0].keys()) and y < len(self.actors):
+					actors.update(self.actors[y][x])
+		self.chunkRangeActors = actors
+
+	def getAllActors(self):
+		return self.allActors
+
+	def removeActor(self, actor, chunkX=None, chunkY=None):
+		if not chunkX: chunkX = self.activeChunkX
+		if not chunkY: chunkY = self.activeChunkY
+		self.actors[chunkY][chunkX].pop(actor.id)
+
+	def getActor(self, actorID, chunkX=None, chunkY=None):
+		if not chunkX: chunkX = self.activeChunkX
+		if not chunkY: chunkY = self.activeChunkY
+		return self.chunkRangeActors[actorID]
 
 	def getActorFixed(self, fixed, actorID):
 		return self.actorsFixed[fixed][actorID]

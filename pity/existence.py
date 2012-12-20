@@ -32,14 +32,15 @@ class Existence(Bindable):
 		self.__selectors_cache__ = {}
 
 	def loadActors(self):
-		for actorID in self.map.actors:
+		for actorID in self.map.getActors():
 			actor = self.map.getActor(actorID)
 			if not self.hasActor(actorID):
 				self.addActor(actor)
+		print 'Loaded actors total (%i)' % len(self.actors)
+
+		self.__selectors_cache__ = {}
 
 	def step(self):
-		self.loadActors()
-
 		trashcan = []
 
 		if self.paused:

@@ -41,7 +41,10 @@ class Grid(object):
 		self.array[y][x] = value
 
 	def get(self, x, y):
-		return self.array[y][x]
+		try:
+			return self.array[y][x]
+		except:
+			return -1
 
 	def getArray(self):
 		return self.array
@@ -51,6 +54,28 @@ class Grid(object):
 
 	def appendRow(self, row):
 		return self.array.append(row)
+
+	def split(self, size):
+		# Blocksize is WH
+		sections = []
+		for sectiony in range(0, len(self.array)):
+			if not sectiony % size[0]:
+				row = []
+				for sectionx in range(0, len(self.array[0])):
+					if not sectionx % size[1]:
+						location = [sectionx, sectiony]
+						block = []
+						for y in range(location[1], location[1]+size[1]):
+							block.append([])
+							for x in range(location[0], location[0]+size[0]):
+								block[y-location[1]].append( self.get(x, y) )
+						row.append(Grid(block))
+				sections.append(row)
+							
+		return sections
+
+
+
 
 	def expandTo(self, w, h):
 		for row in self.getArray():
@@ -114,12 +139,14 @@ if __name__ == '__main__':
 	g1 = Grid([
 		[0, 1, 0],
 		[1, 1, 1],
-		[0, 1, 0]
+		[0, 1, 0],
+		[1, 1, 1]
 	], width=6, height=6)
 	g2 = Grid([
 		[1, 1, 1],
 		[1, 0, 1],
-		[1, 1, 1]
+		[1, 1, 1],
+		[0, 1, 1]
 	])
 	print g1
 	print '---'
@@ -127,3 +154,4 @@ if __name__ == '__main__':
 	print '---'
 	g1.paint(g2, 3, 0)
 	print g1
+	print g1.split([2, 2])
