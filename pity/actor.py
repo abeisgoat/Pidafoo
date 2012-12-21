@@ -52,10 +52,10 @@ class Actor(Stateful, Traitful, Animated):
 	def removeAction(self, actionID):
 		self.actions.remove(actionID)
 
-	def interact(self, interaction, other):
+	def interact(self, interaction, other, data=None):
 		if interaction in self.interactions:
 			self.trigger('interact %s' % (interaction))
-			self.interactions[interaction](self, other)
+			self.interactions[interaction](self, other, data)
 		else:
 			return False
 

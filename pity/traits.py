@@ -65,6 +65,21 @@ class Traitful(object):
 	def addStatModifier(self, mod):
 		self.statModifiers[mod.id] = mod
 
+	def hasStatModifierType(self, modType):
+		if modType != None:
+			for omodKey in self.statModifiers:
+				omod = self.statModifiers[omodKey]
+				if omod.type == modType:
+					return True
+		return False
+
+	def removeStatModifierType(self, modType):
+		if modType != None:
+			for omodKey in self.statModifiers:
+				omod = self.statModifiers[omodKey]
+				if omod.type == modType:
+					self.removeStatModifier(omod)
+
 	def removeStatModifier(self, modId):
 		self.statModifiers.pop(modId)
  
@@ -93,9 +108,10 @@ class Stat(object):
 			return False
 
 class StatModifier(object):
-	def __init__(self, modId, mods):
+	def __init__(self, modId, mods, type=None):
 		self.id = modId
 		self.mods = mods
+		self.type = type
 		self.influences = mods.keys()
 
 	def ify(self, statId, current):

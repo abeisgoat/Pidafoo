@@ -9,7 +9,7 @@ class Physics(object):
 			actor.increaseAttribute('x', xChange)
 			actor.increaseAttribute('y', yChange)
 
-	def adjustForces(self, actor, other):
+	def adjustForces(self, actor, other, data):
 		aBoxF = [actor.getAttribute('x')+actor.getAttribute('forceX'), actor.getAttribute('y')+actor.getAttribute('forceY'), actor.getAttribute('w'), actor.getAttribute('h')]
 		aBox = [actor.getAttribute('x'), actor.getAttribute('y'), actor.getAttribute('w'), actor.getAttribute('h')]
 		oBox = [other.getAttribute('x'), other.getAttribute('y'), other.getAttribute('w'), other.getAttribute('h')]

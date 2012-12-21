@@ -91,9 +91,9 @@ class Existence(Bindable):
 							if not other is a:
 								if (other.dirty or a.dirty) and (other.active and a.active):
 									if ia_check( a, other ):
-										a.interact(interaction, other)
+										a.interact(interaction, other, {'existence': self})
 										interactionResponse = '%s from %s' % (ia['action'], a.id)
-										other.interact(interactionResponse, a)
+										other.interact(interactionResponse, a, {'existence': self})
 			else:
 				trashcan.append(a)
 
@@ -135,7 +135,7 @@ class Existence(Bindable):
 	def removeActor(self, actor):
 		self.trigger('remove actor')
 		if actor.id in self.actors:
-			print 'Removed %s' % self.actors.pop(actor.id).id
+			self.actors.pop(actor.id).id
 		else:
 			raise Exception('Actor with id %s not present in existence' % actor.id)
 
