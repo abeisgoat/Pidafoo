@@ -40,6 +40,7 @@ class Existence(Bindable):
 			actor = self.map.getActor(actorID)
 			if not self.hasActor(actorID):
 				self.addActor(actor)
+
 		print 'Loaded actors total (%i)' % len(self.actors)
 
 		self.__selectors_cache__ = {}

@@ -11,7 +11,7 @@ class Map(object):
 		self.expiredChunkRangeActors = {}
 		self.allActors = {}
 		self.blockSize = 32
-		self.chunkSize = 10
+		self.chunkSize = 11
 		self.activeChunkX = -1
 		self.activeChunkY = -1
 		self.chunkRange = 1
@@ -162,6 +162,7 @@ class Map(object):
 		if not chunkX: chunkX = self.activeChunkX
 		if not chunkY: chunkY = self.activeChunkY
 		# This errors out when the player is on the edge of a chunk passing onto an item pickup
+		self.chunkRangeActors.pop(actor.id)
 		self.actors[chunkY][chunkX].pop(actor.id)
 
 	def getActor(self, actorID, chunkX=None, chunkY=None):
