@@ -74,14 +74,18 @@ class Traitful(object):
 		return False
 
 	def removeStatModifierType(self, modType):
+		trashed = []
 		if modType != None:
 			for omodKey in self.statModifiers:
 				omod = self.statModifiers[omodKey]
 				if omod.type == modType:
-					self.removeStatModifier(omod)
+					trashed.append(omod)
+
+		for mod in trashed:
+			self.removeStatModifier(mod)
 
 	def removeStatModifier(self, modId):
-		self.statModifiers.pop(modId)
+		self.statModifiers.pop(modId.id)
  
  	def react(self, traits, data):
  		for eventID in self.events:

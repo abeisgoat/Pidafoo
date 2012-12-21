@@ -26,6 +26,7 @@ class Animated(object):
 		self.hidden = hidden
 		self.quenedMapID = None
 		self.currentTransition = None
+		self.children = {}
 
 	def requestAnimation(self, animation):
 		if 'priority' in self.maps[self.currentMapID]:
@@ -143,8 +144,11 @@ class Animated(object):
 	def getLayer(self):
 		return self.layer
 
-	def addChildMaps(self, xy, aChild):
+	def addChildMaps(self, xy, aChild, type=None):
 		# If we only tie running to running everythings gonna be running.running and overwrite each other
+		if not type:
+			type = aChild.id
+		self.children[type] = {'actor': aChild, 'x': xy[0], 'y': xy[1]}
 		for mapID in self.maps:
 			if mapID in aChild.maps:
 				children = self.maps[mapID].get('children', {})
@@ -153,6 +157,7 @@ class Animated(object):
 				children[mapID]['y'] = xy[1]
 				self.maps[mapID]['children'] = children
 				if mapID in self.assets:
+					print 'rendering %s' % mapID
 					self.renderSprite(mapID)
 
 	def renderSprite(self, mapID):

@@ -64,6 +64,7 @@ class Effects(Bindable):
 
 		# Reset the animation so that if an effect is for some reason mid-play restart it
 		effect.resetAnimation()
+		return effect
 
 	def getBaseEffect(self, effectID):
 		return self.baseEffects[effectID]
