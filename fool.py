@@ -7,6 +7,8 @@ from pygame import *
 from collections import defaultdict
 from pidafoo.pity import interactions
 
+gridLines = True
+
 class Graphics(object):
 	def __init__(self, screenSize, centerActor='Player'):
 		self.screenSize = screenSize
