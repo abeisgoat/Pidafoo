@@ -3,8 +3,8 @@
 # App Name: Da -> Digital Animator
 # Author: Abe Haskins
 # Date: 27 November, 2012
-from PIL import Image
 import pygame
+from PIL import Image
 
 class Animated(object):
 	def __init__(self, maps=None, default=None, framerate=30, hidden=False):
@@ -87,47 +87,55 @@ class Animated(object):
 		else:
 			cMap = self.maps[mapID]['children'][childID]
 
-		image = Image.open(cMap['sprite'])
-
-		columns = image.size[0]/cMap['width']
-		rows = image.size[1]/cMap['height']
-
 		spriteWidth = cMap['width']
 		spriteHeight = cMap['height']
+
+		spriteSize = [
+			spriteWidth, 
+			spriteHeight
+		]
+
+		if 'sprite' in cMap:
+			surface =  pygame.image.load(cMap['sprite'])
+		elif 'sprite_func' in cMap:
+			surface = cMap['sprite_func'](cMap)
+		else:
+			raise Exception('Map is lacking either sprite or sprite_func')
+
+		columns = surface.get_width()/cMap['width']
+		rows = surface.get_height()/cMap['height']
 
 		sprites = []
 		sprites_flipped = []
 		for r in range(0, rows):
 			for c in range(0, columns):
-				sprite = image.crop([c*spriteWidth, r*spriteHeight, (c+1)*spriteWidth, (r+1)*spriteHeight])
+				sprite = pygame.Surface(spriteSize, flags=pygame.SRCALPHA)
+				sprite.blit(surface, (0, 0), [c*spriteWidth, r*spriteHeight, (c+1)*spriteWidth, (r+1)*spriteHeight])
 				spriteSize = [
 					spriteWidth, 
 					spriteHeight
 				]
-				#faprint spriteSize, sprite.size, [r*spriteWidth, c*spriteHeight, (r+1)*spriteWidth, (r+1)*spriteHeight]
-				surface = pygame.image.fromstring(
-					sprite.tostring(), 
-					spriteSize, 
-					image.mode
-				)
-				surface.convert()
-				sprites.append(surface)
-				sprites_flipped.append(pygame.transform.flip(surface, True, False))
+				sprites.append(sprite)
+				sprites_flipped.append(pygame.transform.flip(sprite, True, False))
 
 		if cMap.get('reverse', False):
 			sprites.reverse()
 
-		if childID is None:
-			self.assets[mapID] = sprites
-			self.assets[mapID + '_flipped'] = sprites_flipped
-		else:
-			self.assets[mapID + '.' + childID] = sprites
-			self.assets[mapID + '.' + childID + '_flipped'] = sprites_flipped
+		store = True
+		if 'sprite_store' in cMap:
+			store = cMap['sprite_store']
+
+		if store:
+			if childID is None:
+				self.assets[mapID] = sprites
+				self.assets[mapID + '_flipped'] = sprites_flipped
+			else:
+				self.assets[mapID + '.' + childID] = sprites
+				self.assets[mapID + '.' + childID + '_flipped'] = sprites_flipped
 		return sprites, sprites_flipped
 
 	def getAssets(self, mapID):
 		if not mapID in self.assets:
-			print 'Loading assets %s for %s' % (mapID, self.id)
 			return self.loadAsset(mapID)
 		else:
 			return self.assets[mapID], self.assets[mapID + '_flipped']

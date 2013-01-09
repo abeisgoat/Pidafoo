@@ -20,6 +20,7 @@ from physics import *
 from stateful import *
 from traits import *
 from utils import *
+from text import *
 
 class Game(Bindable):
 	'''
@@ -41,6 +42,7 @@ class Game(Bindable):
 		self.dataset = None
 		self.datasetFallback = 'vanilla'
 		self.existence = None
+		self.fps = 0
 
 	def setExistence(self, existence):
 		self.trigger('change existence')
@@ -87,11 +89,11 @@ class Game(Bindable):
 				self.datasetFallback
 			))
 
-	def run(self, fps=60):
+	def run(self, dfps=60):
 		self.trigger('start')
 		keysDown = []
 		while (1):
-			self.clock.tick(fps)
+			self.clock.tick(dfps)
 
 			keys = pygame.key.get_pressed() # Write down keys
 			mods = pygame.key.get_mods() # Write down mods
@@ -115,4 +117,4 @@ class Game(Bindable):
 				elif event.type == KEYDOWN and event.key == K_ESCAPE: return
 
 			pygame.display.flip()
-			#print self.clock.get_fps()
+			self.fps = self.clock.get_fps()

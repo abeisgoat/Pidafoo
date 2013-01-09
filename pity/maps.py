@@ -15,6 +15,7 @@ class Map(object):
 		self.activeChunkX = -1
 		self.activeChunkY = -1
 		self.chunkRange = 1
+		self.chunks = None
 
 		if gridset:
 			self.loadGridset(gridset)
@@ -29,23 +30,24 @@ class Map(object):
 			self.blocks = {}
 
 	def loadGridset(self, gridset):
+		self.chunks = {}
 		for layer in gridset:
 			if not isinstance(gridset[layer], Grid):
 				grid = Grid(gridset[layer])
 			else:
 				grid = gridset[layer]
 
-			chunks = grid.split([self.chunkSize, self.chunkSize])
+			self.chunks[layer] = grid.split([self.chunkSize, self.chunkSize])
 
-			print "Broke map into %s chunks" % len(chunks)
+			print "Broke map into %s chunks" % len(self.chunks), 'of size', self.chunkSize
 
-			for r, chunksRow in enumerate(chunks):
+			for r, chunksRow in enumerate(self.chunks[layer]):
 				row = self.actors.get(r, {})
-				for ch,chunk in enumerate(chunksRow):
+				for ch, chunk in enumerate(chunksRow):
 					actors = row.get(ch, {})
 					# Gross hack to make map draw right
-					chunk.appendRow([0 for i in range(0, len(grid.getArray()[0]))])
-					chunkActors = self.gridToActors(chunk, layer=layer, prefix='Block-Chunk%ix%i' % (r, ch), offset=[ch*chunk.height*self.blockSize, r*chunk.width*self.blockSize])
+					chunk.appendRow([0 for i in range(0, len(chunk.getArray()[0]))])
+					chunkActors = self.gridToActors(chunk.copy(), layer=layer, prefix='Block-Chunk%ix%i' % (r, ch), offset=[ch*chunk.height*self.blockSize, r*chunk.width*self.blockSize])
 					actors.update(chunkActors)
 					self.allActors.update(chunkActors)
 					row[ch] = actors
@@ -145,15 +147,27 @@ class Map(object):
 		self.updateChunkRangeActors()
 
 	def updateChunkRangeActors(self):
+		print 'Expiring chunk range actors'
 		self.expiredChunkRangeActors = dict(**self.chunkRangeActors)
-		actors = {}
-		rangeChunks = 0
-		for x in range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1):
-			for y in range(self.activeChunkY-self.chunkRange, self.activeChunkY+self.chunkRange+1):
-				if x >= 0 and y >= 0 and x < len(self.actors[0].keys()) and y < len(self.actors):
-					rangeChunks += 1
-					actors.update(self.actors[y][x])
-		self.chunkRangeActors = actors
+
+		print 'Preparing new map segment'
+		chunkRange = len(range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1))
+		segment = Grid(width=(chunkRange*self.chunkSize)+11, height=(chunkRange*self.chunkSize)+12)
+		self.chunkRangeActors = {}
+
+		print 'Setting up segment'
+		for layer in range(0, len(self.chunks)):
+			layer = str(layer)
+			for x in range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1):
+				for y in range(self.activeChunkY-self.chunkRange, self.activeChunkY+self.chunkRange+1):
+					if x >= 0 and y >= 0 and x < len(self.actors[0].keys()) and y < len(self.actors):
+						grid = self.chunks[layer][y][x]
+						segment.paint(grid, x*self.chunkSize, y*self.chunkSize)
+
+			print 'Generating new actors'
+			actors = self.gridToActors(segment, layer=int(layer))
+			self.chunkRangeActors.update(actors)
+		return True
 
 	def getAllActors(self):
 		return self.allActors
@@ -162,8 +176,9 @@ class Map(object):
 		if not chunkX: chunkX = self.activeChunkX
 		if not chunkY: chunkY = self.activeChunkY
 		# This errors out when the player is on the edge of a chunk passing onto an item pickup
+		# Does it still? Idk
 		self.chunkRangeActors.pop(actor.id)
-		self.actors[chunkY][chunkX].pop(actor.id)
+		#self.actors[chunkY][chunkX].pop(actor.id)
 
 	def getActor(self, actorID, chunkX=None, chunkY=None):
 		if not chunkX: chunkX = self.activeChunkX

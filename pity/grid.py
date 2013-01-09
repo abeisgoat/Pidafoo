@@ -3,7 +3,7 @@ import json
 
 infinity = 'infinity'
 class Grid(object):
-	def __init__(self, array=None, gridFile=None, width=None, height=None):
+	def __init__(self, array=None, gridFile=None, width=None, height=None, defaultValue=0):
 		# The array is the underlying storage
 		if gridFile:
 			self.array = json.loads(open(gridFile).read())
@@ -13,7 +13,7 @@ class Grid(object):
 			self.array = array
 			self.width = len(array[0])
 			self.height = len(array)
-		else:
+		elif width and height:
 			self.array = [[]]
 			self.width = 0
 			self.height = 0
@@ -22,9 +22,10 @@ class Grid(object):
 			self.width = width
 			self.height = height
 
-		self.defaultValue = 0
+		self.defaultValue = defaultValue
+		self.expandTo(self.width, self.height)
 
-		assert gridFile or len(array) or (width and height), 'Expected either array or width and height'
+		assert gridFile or len(self.array) or (width and height), 'Expected either array or width and height'
 
 	def __str__(self):
 		# Convert grid to string
@@ -38,7 +39,10 @@ class Grid(object):
 		return '\n'.join(string_rows)
 
 	def set(self, x, y, value):
-		self.array[y][x] = value
+		try:
+			self.array[y][x] = value
+		except IndexError:
+			raise Exception('Can not set point %ix%i on grid of size %ix%i' % (x, y, len(self.array[0]), len(self.array)))
 
 	def get(self, x, y):
 		try:
@@ -74,18 +78,18 @@ class Grid(object):
 							
 		return sections
 
-
-
-
 	def expandTo(self, w, h):
-		for row in self.getArray():
-			if len(row) < w:
-				row.extend([self.defaultValue for b in range(0, w-len(row))])
+		if w != infinity and h != infinity:
+			for row in self.getArray():
+				if len(row) < w:
+					row.extend([self.defaultValue for b in range(0, w-len(row))])
 
-		for r in range(0, h-len(self.getArray())):
-			self.appendRow([self.defaultValue for b in range(0, w)])
+			for r in range(0, h-len(self.getArray())):
+				self.appendRow([self.defaultValue for b in range(0, w)])
 
-		return True
+			return True
+		else:
+			return False
 
 	def canPaint(self, x, y, w, h):
 		# Checks to see
@@ -112,6 +116,15 @@ class Grid(object):
 
 	def isEmpty(self):
 		return not bool(len(self.getArray()))
+
+	def copy(self):
+		carray = []
+		for row in self.array:
+			crow = []
+			for x in row:
+				crow.append(x)
+			carray.append(crow)
+		return Grid(carray)
 
 	def paint(self, grid, xoffset=0, yoffset=0):
 		# Make sure the grid has content
