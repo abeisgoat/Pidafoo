@@ -4,7 +4,6 @@
 # Author: Abe Haskins
 # Date: 27 November, 2012
 import pygame
-from PIL import Image
 
 class Animated(object):
 	def __init__(self, maps=None, default=None, framerate=30, hidden=False):
