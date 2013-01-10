@@ -32,6 +32,7 @@ class Existence(Bindable):
 		self.__selectors_cache__ = {}
 
 	def loadActors(self):
+		print 'Loading Actors'
 		for actorID,actor in self.map.getExpiredActors().items():
 			if self.hasActor(actorID):
 				self.removeActor(actor)

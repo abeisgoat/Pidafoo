@@ -107,6 +107,7 @@ class Map(object):
 						aBlock.setAttribute('solid', self.blocks[block].solid)
 						aBlock.setAttribute('color', self.blocks[block].color)
 						aBlock.setAttribute('group', self.blocks[block].group)
+						aBlock.setAttribute('type', block)
 						aBlock.setAttribute('constant', self.blocks[block].constant)
 
 					if aBlock.getAttribute('constant'):
@@ -120,6 +121,8 @@ class Map(object):
 					actions 		= self.blocks[block].actions
 					reactions 		= self.blocks[block].reactions
 					attributes 		= self.blocks[block].attributes
+
+					aBlock.dirty = True
 
 					if hasattr(self.blocks[block], 'animationMaps'):
 						animationMaps = self.blocks[block].animationMaps
