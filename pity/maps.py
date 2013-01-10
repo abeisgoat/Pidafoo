@@ -10,6 +10,7 @@ class Map(object):
 		self.chunkRangeActors = {}
 		self.expiredChunkRangeActors = {}
 		self.allActors = {}
+		self.constantActors = {}
 		self.blockSize = 32
 		self.chunkSize = 11
 		self.activeChunkX = -1
@@ -95,14 +96,22 @@ class Map(object):
 					if not h:
 						h = 1
 
-					aBlock.setAttribute('w', w*self.blockSize)
-					aBlock.setAttribute('h', h*self.blockSize)
-					aBlock.setAttribute('x', x*self.blockSize+ offset[0])
-					aBlock.setAttribute('y', y*self.blockSize+ offset[1])
+					if aBlock.id in self.constantActors:
+						aBlock.attributes = self.constantActors[aBlock.id]
+					else:
+						aBlock.setAttribute('w', w*self.blockSize)
+						aBlock.setAttribute('h', h*self.blockSize)
+						aBlock.setAttribute('x', x*self.blockSize+ offset[0])
+						aBlock.setAttribute('y', y*self.blockSize+ offset[1])
 
-					aBlock.setAttribute('solid', self.blocks[block].solid)
-					aBlock.setAttribute('color', self.blocks[block].color)
-					aBlock.setAttribute('group', self.blocks[block].group)
+						aBlock.setAttribute('solid', self.blocks[block].solid)
+						aBlock.setAttribute('color', self.blocks[block].color)
+						aBlock.setAttribute('group', self.blocks[block].group)
+						aBlock.setAttribute('constant', self.blocks[block].constant)
+
+					if aBlock.getAttribute('constant'):
+						self.constantActors[aBlock.id] = aBlock.attributes
+
 					aBlock.setLayer(int(layer))
 
 					interactions 	= self.blocks[block].interactions
@@ -164,7 +173,7 @@ class Map(object):
 						grid = self.chunks[layer][y][x]
 						segment.paint(grid, x*self.chunkSize, y*self.chunkSize)
 
-			print 'Generating new actors'
+			print 'Generating new actors for layer %s' % layer
 			actors = self.gridToActors(segment, layer=int(layer))
 			self.chunkRangeActors.update(actors)
 		return True

@@ -30,10 +30,10 @@ class Game(Bindable):
 	- load existence (existence changed)
 	- pressed [key] (key pressed)
 	'''
-	def __init__(self, screenSize):
+	def __init__(self, screenSize, name="Template Game"):
 		Bindable.__init__(self)
 		pygame.init()
-		pygame.display.set_caption('Template Game')
+		pygame.display.set_caption(name)
 
 		self.screen = pygame.display.set_mode(screenSize)
 		self.screenSize = screenSize
