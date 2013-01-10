@@ -166,6 +166,10 @@ class Map(object):
 	def updateChunkRangeActors(self):
 		print 'Expiring chunk range actors'
 		self.expiredChunkRangeActors = dict(**self.chunkRangeActors)
+		for actor in self.expiredChunkRangeActors:
+			a = self.expiredChunkRangeActors[actor]
+			if a.id in self.constantActors:
+				self.constantActors[a.id] = a.attributes
 
 		print 'Preparing new map segment'
 		chunkRange = len(range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1))
@@ -194,8 +198,6 @@ class Map(object):
 		if not chunkY: chunkY = self.activeChunkY
 		# This errors out when the player is on the edge of a chunk passing onto an item pickup
 		# Does it still? Idk
-		if aBlock.id in self.constantActors:
-			self.constantActors[aBlock.id] = aBlock.attributes
 		self.chunkRangeActors.pop(actor.id)
 		#self.actors[chunkY][chunkX].pop(actor.id)
 
