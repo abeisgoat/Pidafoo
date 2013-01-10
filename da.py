@@ -38,7 +38,7 @@ class Animated(object):
 		else:
 			rPriority = 0
 
-		if rPriority > cPriority and not animation in [self.getAnimation(), self.getQuenedAnimation()]:
+		if rPriority >= cPriority and not animation in [self.getAnimation(), self.getQuenedAnimation()]:
 			self.setAnimation(animation)
 			return True
 		else:

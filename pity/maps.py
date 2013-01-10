@@ -133,7 +133,12 @@ class Map(object):
 						aBlock.addInteraction(interaction, interactions[interaction])
 
 					for binding in bindings:
-						aBlock.bind(binding, bindings[binding])
+						b = bindings[binding]
+						if isinstance(b, list):
+							for bb in b:
+								aBlock.bind(binding, bb)
+						else:
+							aBlock.bind(binding, b)
 
 					for trait in traits:
 						aBlock.addStat(trait, traits[trait])
@@ -189,6 +194,8 @@ class Map(object):
 		if not chunkY: chunkY = self.activeChunkY
 		# This errors out when the player is on the edge of a chunk passing onto an item pickup
 		# Does it still? Idk
+		if aBlock.id in self.constantActors:
+			self.constantActors[aBlock.id] = aBlock.attributes
 		self.chunkRangeActors.pop(actor.id)
 		#self.actors[chunkY][chunkX].pop(actor.id)
 

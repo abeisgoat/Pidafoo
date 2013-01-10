@@ -6,16 +6,6 @@ from pidafoo.da import *
 
 class Actor(Stateful, Traitful, Animated):
 	def __init__(self, aID, attributes=None, actions=None, interactions=None, hidden=None):
-		Stateful.__init__(self)
-		Traitful.__init__(self)
-		Animated.__init__(self, hidden=hidden)
-		self.id = aID 		# Unique ID of this actor
-		self.dirty = False	# Has something changed that would require checking interactions?
-		self.active = False # Is this actor active?
-		self.fixed = False	# Is this fixed to a specific point? (Never used, I dont think)
-		self.trash = False	# Set to true to retire this actor and release it's memory to the world
-		self.is_child = False
-
 		if not attributes:
 			self.attributes = {
 				'x': 0,
@@ -36,6 +26,17 @@ class Actor(Stateful, Traitful, Animated):
 			self.actions = {}
 		else:
 			self.actions = actions
+			
+		Stateful.__init__(self)
+		Traitful.__init__(self)
+		Animated.__init__(self, hidden=hidden)
+		self.id = aID 		# Unique ID of this actor
+		self.dirty = False	# Has something changed that would require checking interactions?
+		self.active = False # Is this actor active?
+		self.fixed = False	# Is this fixed to a specific point? (Never used, I dont think)
+		self.trash = False	# Set to true to retire this actor and release it's memory to the world
+		self.is_child = False
+		self.effectsQuene = []
 
 		self.prioritizedInteractions = False
 
@@ -107,6 +108,16 @@ class Actor(Stateful, Traitful, Animated):
 			self.increaseAttribute(attribute, amount)
 		elif value > ideal:
 			self.decreaseAttribute(attribute, amount)
+
+	# This is kinda crummy, I might get rid of it
+	def playEffect(self, effect):
+		self.effectsQuene.append(effect)
+
+	def emptyEffects(self):
+		effects = self.effectsQuene
+		self.effectsQuene = []
+		return effects
+	# End of Crummy
 
 	def step(self):
 		self.trigger('step')

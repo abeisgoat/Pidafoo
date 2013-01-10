@@ -105,6 +105,9 @@ class Existence(Bindable):
 		for actor in self.actors:
 			a = self.getActor(actor)
 			a.step()
+			for effect in a.emptyEffects():
+				self.effects.play(effect, a)
+
 		self.effects.step()
 
 	def interactOn(self, actor, action, relative_point):
