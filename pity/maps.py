@@ -96,6 +96,13 @@ class Map(object):
 					if not h:
 						h = 1
 
+					interactions 	= self.blocks[block].interactions
+					bindings 		= self.blocks[block].bindings
+					traits 			= self.blocks[block].traits
+					actions 		= self.blocks[block].actions
+					reactions 		= self.blocks[block].reactions
+					attributes 		= self.blocks[block].attributes
+
 					if aBlock.id in self.constantActors:
 						aBlock.attributes = self.constantActors[aBlock.id]
 					else:
@@ -110,17 +117,13 @@ class Map(object):
 						aBlock.setAttribute('type', block)
 						aBlock.setAttribute('constant', self.blocks[block].constant)
 
+						for trait in traits:
+							aBlock.addStat(trait, traits[trait])
+
 					if aBlock.getAttribute('constant'):
 						self.constantActors[aBlock.id] = aBlock.attributes
 
 					aBlock.setLayer(int(layer))
-
-					interactions 	= self.blocks[block].interactions
-					bindings 		= self.blocks[block].bindings
-					traits 			= self.blocks[block].traits
-					actions 		= self.blocks[block].actions
-					reactions 		= self.blocks[block].reactions
-					attributes 		= self.blocks[block].attributes
 
 					aBlock.dirty = True
 
@@ -139,9 +142,6 @@ class Map(object):
 								aBlock.bind(binding, bb)
 						else:
 							aBlock.bind(binding, b)
-
-					for trait in traits:
-						aBlock.addStat(trait, traits[trait])
 
 					for reaction in reactions:
 						react = ReactionEvent(reaction, reactions[reaction])

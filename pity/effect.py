@@ -85,7 +85,7 @@ class Effects(Bindable):
 
 	def addBaseEffect(self, effect):
 		# An effect is just an actor base who gets cloned a lot
-		effect.hidden = True
+		effect.setHidden(True)
 		self.trigger('add effect')
 		if not effect.id in self.baseEffects:
 			self.baseEffects[effect.id] = effect

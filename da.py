@@ -22,10 +22,10 @@ class Animated(object):
 		self.layer = 0
 		self.framerate = 30
 		self.frame = 0
-		self.hidden = hidden
 		self.quenedMapID = None
 		self.currentTransition = None
 		self.children = {}
+		self.setHidden(hidden)
 
 	def requestAnimation(self, animation):
 		if 'priority' in self.maps[self.currentMapID]:
@@ -61,18 +61,18 @@ class Animated(object):
 				self.trigger('animation-set', {'animation': self.currentMapID})
 
 	def setHidden(self, hidden):
-		if hidden and not self.hidden:
+		if hidden and not self.getAttribute('hidden'):
 			self.trigger('hide')
-		elif not hidden and self.hidden:
+		elif not hidden and self.getAttribute('hidden'):
 			self.trigger('show')
-		self.hidden = hidden
+		self.setAttribute('hidden', hidden)
 
 	def getAnimation(self):
 		return self.currentMapID
 
 	def resetAnimation(self):
 		self.frame = 0
-		self.hidden = False
+		self.setHidden(False)
 
 	def getQuenedAnimation(self):
 		return self.quenedMapID
@@ -185,7 +185,7 @@ class Animated(object):
 
 
 	def getSprite(self):
-		if self.hidden:
+		if self.getAttribute('hidden'):
 			return pygame.Surface((0,0))
 		elif not self.currentMapID is None:
 			cMap = self.getMap(self.currentMapID)
