@@ -35,6 +35,7 @@ class Existence(Bindable):
 		print 'Loading Actors'
 		for actorID,actor in self.map.getExpiredActors().items():
 			if self.hasActor(actorID):
+				actor.trigger('trashed')
 				self.removeActor(actor)
 
 		for actorID in self.map.getActors():
@@ -101,6 +102,7 @@ class Existence(Bindable):
 		for a in trashcan:
 			self.removeActor(a)
 			self.map.removeActor(a)
+			a.trigger('trashed')
 
 		for actor in self.actors:
 			a = self.getActor(actor)

@@ -103,17 +103,22 @@ class Animated(object):
 
 		columns = surface.get_width()/cMap['width']
 		rows = surface.get_height()/cMap['height']
+		repeat = cMap['spriteRepeat'] if 'spriteRepeat' in cMap else False
 
 		sprites = []
 		sprites_flipped = []
 		for r in range(0, rows):
 			for c in range(0, columns):
-				sprite = pygame.Surface(spriteSize, flags=pygame.SRCALPHA)
-				sprite.blit(surface, (0, 0), [c*spriteWidth, r*spriteHeight, (c+1)*spriteWidth, (r+1)*spriteHeight])
-				spriteSize = [
-					spriteWidth, 
-					spriteHeight
-				]
+				if not repeat:
+					sprite = pygame.Surface(spriteSize, flags=pygame.SRCALPHA)
+					sprite.blit(surface, (0, 0), [c*spriteWidth, r*spriteHeight, (c+1)*spriteWidth, (r+1)*spriteHeight])
+				else:
+					sprite = pygame.Surface([self.getAttribute('w'), self.getAttribute('h')], flags=pygame.SRCALPHA)
+					for xrp in range(0, self.getAttribute('w')/spriteWidth):
+						for yrp in range(0, self.getAttribute('h')/spriteHeight):
+							sprite.blit(surface, (spriteWidth*xrp, spriteHeight*yrp), [c*spriteWidth, r*spriteHeight, (c+1)*spriteWidth, (r+1)*spriteHeight])
+
+
 				sprites.append(sprite)
 				sprites_flipped.append(pygame.transform.flip(sprite, True, False))
 
