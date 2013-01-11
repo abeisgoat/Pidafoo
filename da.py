@@ -152,7 +152,6 @@ class Animated(object):
 		return self.layer
 
 	def addChildMaps(self, xy, aChild, type=None):
-		# If we only tie running to running everythings gonna be running.running and overwrite each other
 		if not type:
 			type = aChild.id
 		self.children[type] = {'actor': aChild, 'x': xy[0], 'y': xy[1]}
@@ -164,7 +163,6 @@ class Animated(object):
 				children[mapID]['y'] = xy[1]
 				self.maps[mapID]['children'] = children
 				if mapID in self.assets:
-					print 'rendering %s' % mapID
 					self.renderSprite(mapID)
 
 	def renderSprite(self, mapID):
@@ -173,15 +171,35 @@ class Animated(object):
 			surfaceFlipped 	= self.assets[mapID + '_flipped'][frame]
 			for childID in self.maps[mapID]['children']:
 				childMap = self.maps[mapID]['children'][childID]
-				self.loadAsset(mapID, childID) # This should be replaced with a refference to a standard resource bank
+				self.loadAsset(mapID, childID) # This should be replaced with a reference to a standard resource bank
+				alignment = 'none' if not 'align' in childMap else childMap['align']
+
+				mapSizeDiff = [
+					self.maps[mapID]['width']-childMap['width'], 
+					self.maps[mapID]['height']-childMap['height']
+				]
+
 				# Draw normal
 				childSurface = self.assets['%s.%s' % (mapID, childID)]
 				childFrame = frame % len(childSurface)
-				surface.blit(childSurface[childFrame], [childMap['x'], childMap['y']])
+				if alignment is 'right':
+					adjustmentX = mapSizeDiff[0]
+					adjustmentY = mapSizeDiff[1]
+				else:
+					adjustmentX = 0
+					adjustmentY = 0
+				surface.blit(childSurface[childFrame], [childMap['x']+adjustmentX, childMap['y']+adjustmentY])
+
 				# Draw flipped
 				childSurface = self.assets['%s.%s' % (mapID, childID + '_flipped')]
 				childFrame = frame % len(childSurface)
-				surfaceFlipped.blit(childSurface[childFrame], [-childMap['x'], childMap['y']])
+				if alignment is 'left':
+					adjustmentX = mapSizeDiff[0]
+					adjustmentY = mapSizeDiff[1]
+				else:
+					adjustmentX = 0
+					adjustmentY = 0
+				surfaceFlipped.blit(childSurface[childFrame], [-childMap['x']+adjustmentX, childMap['y']+adjustmentY])
 
 
 	def getSprite(self):

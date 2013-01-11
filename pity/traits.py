@@ -54,6 +54,9 @@ class Traitful(object):
 		else:
 			return None
 
+	def getStats(self):
+		return self.getAttribute('stats')
+
 	def removeStat(self, statID):
 		self.trigger('remove-stat %s' % statID)
 		self.getAttribute('stats').remove(statID)

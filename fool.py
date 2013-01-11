@@ -3,6 +3,7 @@
 # App Name: Fool -> I like drawing stuff onto the windows!
 # Author: Abe Haskins
 # Date: 27 November, 2012
+import pygame
 from pygame import *
 from collections import defaultdict
 from pidafoo.pity import interactions
@@ -15,6 +16,7 @@ class Graphics(object):
 		self.centerActor = centerActor
 		self.viewport = [-64, -64, self.screenSize[0]+128, self.screenSize[1]+128]
 		self.tightViewport = [0, 0, self.screenSize[0], self.screenSize[1]]
+		self.static = pygame.Surface((11*3*32, 11*3*32))
 
 	def render(self, game, data):
 		# Clear the screen
