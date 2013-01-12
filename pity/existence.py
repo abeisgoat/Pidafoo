@@ -34,7 +34,7 @@ class Existence(Bindable):
 	def loadActors(self):
 		print 'Loading Actors'
 		for actorID,actor in self.map.getExpiredActors().items():
-			if self.hasActor(actorID):
+			if self.hasActor(actorID) and not actor.getAttribute('persistant'):
 				actor.trigger('trashed')
 				self.removeActor(actor)
 
@@ -150,6 +150,13 @@ class Existence(Bindable):
 			return self.actors[actorID]
 		except KeyError:
 			raise Exception('Invalid actor with ID "%s"' % actorID)
+
+	def getActorsByGroup(self, actorGroup):
+		actors = []
+		for actorID in self.actors:
+			if self.actors[actorID].getAttribute('group') == actorGroup:
+				actors.append(self.actors[actorID])
+		return actors
 
 	def hasActor(self, actorID):
 		return actorID in self.actors

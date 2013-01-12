@@ -9,8 +9,10 @@ class Map(object):
 
 		self.chunkRangeActors = {}
 		self.expiredChunkRangeActors = {}
+		self.nonExpirableActors = {}
 		self.allActors = {}
-		self.constantActors = {}
+		self.consistentActors = {}
+		self.persistantActors = {}
 		self.blockSize = 32
 		self.chunkSize = 11
 		self.activeChunkX = -1
@@ -98,13 +100,13 @@ class Map(object):
 
 					interactions 	= self.blocks[block].interactions
 					bindings 		= self.blocks[block].bindings
-					traits 			= self.blocks[block].traits
+					stats			= self.blocks[block].stats
 					actions 		= self.blocks[block].actions
 					reactions 		= self.blocks[block].reactions
 					attributes 		= self.blocks[block].attributes
 
-					if aBlock.id in self.constantActors:
-						aBlock.attributes = self.constantActors[aBlock.id]
+					if aBlock.id in self.consistentActors:
+						aBlock.attributes = self.consistentActors[aBlock.id]
 					else:
 						aBlock.setAttribute('w', w*self.blockSize)
 						aBlock.setAttribute('h', h*self.blockSize)
@@ -115,22 +117,54 @@ class Map(object):
 						aBlock.setAttribute('color', self.blocks[block].color)
 						aBlock.setAttribute('group', self.blocks[block].group)
 						aBlock.setAttribute('type', block)
-						aBlock.setAttribute('constant', self.blocks[block].constant)
+						aBlock.setAttribute('consistent', self.blocks[block].consistent)
 
-						for trait in traits:
-							aBlock.addStat(trait, traits[trait])
+						for attribute in attributes:
+							aBlock.setAttribute(attribute, attributes[attribute])
 
-					if aBlock.getAttribute('constant'):
-						self.constantActors[aBlock.id] = aBlock.attributes
+						for stat in stats:
+							s = stats[stat]
+							value = s['value'] if 'value' in s else 0
+							mi = s['min'] if 'min' in s else None
+							ma = s['max'] if 'max' in s else None
+							aBlock.addStat(stat, value=value, min=mi, max=ma)
 
-					aBlock.setLayer(int(layer))
+					if aBlock.getAttribute('consistent'):
+						self.consistentActors[aBlock.id] = aBlock.attributes
+
+					persistant = False
+					if aBlock.getAttribute('persistant'):
+						pl = self.persistantActors.get(str(layer), {})
+						persistant = aBlock.id in pl
+						pl[aBlock.id] = aBlock
+						self.persistantActors[str(layer)] = pl
+
+					if not aBlock.getAttribute('expirable'):
+						self.nonExpirableActors[aBlock.id] = aBlock
+
+					l = aBlock.getAttribute('layer')
+					if l:
+						aBlock.setLayer(l)
+					else:
+						aBlock.setLayer(int(layer))
 
 					aBlock.dirty = True
+
+					aID = aBlock.getAttribute('id')
+					if aID:
+						print 'setting aID', aid
+						aBlock.id = aID
 
 					if hasattr(self.blocks[block], 'animationMaps'):
 						animationMaps = self.blocks[block].animationMaps
 						aBlock.setAnimationMaps(animationMaps)
-						aBlock.setAnimation('default')
+						
+						currentMapID = aBlock.getAttribute('currentMapID')
+						if currentMapID:
+							print 'setting cmap', currentMapID
+							aBlock.setAnimation(currentMapID)
+						else:
+							aBlock.setAnimation('default')
 
 					for interaction in interactions:
 						aBlock.addInteraction(interaction, interactions[interaction])
@@ -151,8 +185,8 @@ class Map(object):
 						aBlock.setAttribute(attribute, attributes[attribute])
 
 					aBlock.setActions(actions)
-
-					actors[aid] = aBlock
+					if not persistant:
+						actors[aBlock.id] = aBlock
 		return actors
 
 	def getActors(self):
@@ -168,8 +202,8 @@ class Map(object):
 		self.expiredChunkRangeActors = dict(**self.chunkRangeActors)
 		for actor in self.expiredChunkRangeActors:
 			a = self.expiredChunkRangeActors[actor]
-			if a.id in self.constantActors:
-				self.constantActors[a.id] = a.attributes
+			if a.id in self.consistentActors:
+				self.consistentActors[a.id] = a.attributes
 
 		print 'Preparing new map segment'
 		chunkRange = len(range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1))

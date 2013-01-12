@@ -18,19 +18,7 @@ class Graphics(object):
 		self.tightViewport = [0, 0, self.screenSize[0], self.screenSize[1]]
 		self.static = pygame.Surface((11*3*32, 11*3*32))
 
-	def render(self, game, data):
-		# Clear the screen
-		draw.rect(game.screen, Color('#cccccc'), Rect(0, 0, self.screenSize[0], self.screenSize[1]))
-
-		# Load up our center actor
-		ca = game.existence.getActor(self.centerActor)
-
-		# Sort out how much we need to shift stuff to keep the player centered
-		offset = [
-			ca.getAttribute('x')-((self.screenSize[0]-ca.getAttribute('w'))/2), 
-			ca.getAttribute('y')-((self.screenSize[1]-ca.getAttribute('h'))/2)
-		]
-
+	def sortLayers(self, game):
 		# Create a layers dict that defaults to a list (for the actors on that layer)
 		layers = defaultdict(list)
 
@@ -48,6 +36,31 @@ class Graphics(object):
 			actor = game.existence.map.getActor(actorID)
 			layers[actor.layer].append(actor)
 
+		return layers
+
+	def draw(self, game, sprite, rect):
+		game.screen.blit(sprite, rect)
+
+	def isActive(self, actorRect, viewport):
+		return interactions.over(actorRect, viewport)
+
+	def getSprite(self, actor):
+		return actor.getSprite()
+
+	def render(self, game, data):
+		# Clear the screen
+		game.screen.fill(pygame.Color('#cccccc'))
+
+		# Load up our center actor
+		ca = game.existence.getActor(self.centerActor)
+
+		# Sort out how much we need to shift stuff to keep the player centered
+		offset = [
+			ca.getAttribute('x')-((self.screenSize[0]-ca.getAttribute('w'))/2), 
+			ca.getAttribute('y')-((self.screenSize[1]-ca.getAttribute('h'))/2)
+		]
+
+		layers = self.sortLayers(game)
 
 		# Loop through all our actors
 		for layer in layers:
@@ -69,13 +82,13 @@ class Graphics(object):
 				else:
 					viewport = self.viewport
 
-				if interactions.over(actorRect, viewport) or actor.fixed:
-					sprite = actor.getSprite()
+				if self.isActive(actorRect, viewport) or actor.fixed:
+					sprite = self.getSprite(actor)
 					actor.active = True
 					actorRect[0] -= actor.getAttribute('xoffset')
 					actorRect[1] -= actor.getAttribute('yoffset')
 					rect = Rect(*actorRect)
-					game.screen.blit(sprite, rect)
+					self.draw(game, sprite, rect)
 				else:
 					actor.active = False
 
