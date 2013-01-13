@@ -4,12 +4,14 @@ from utils import *
 class Physics(object):
 	def applyForces(self, actor, data):
 		if actor.active:
+		#	print 'Applying forces for', actor.id
 			xChange = actor.getAttribute('forceX')
 			yChange = actor.getAttribute('forceY')
 			actor.increaseAttribute('x', xChange)
 			actor.increaseAttribute('y', yChange)
 
 	def adjustForces(self, actor, other, data):
+		#print 'Adjusting physics for', actor.id
 		aBoxF = [actor.getAttribute('x')+actor.getAttribute('forceX'), actor.getAttribute('y')+actor.getAttribute('forceY'), actor.getAttribute('w'), actor.getAttribute('h')]
 		aBox = [actor.getAttribute('x'), actor.getAttribute('y'), actor.getAttribute('w'), actor.getAttribute('h')]
 		oBox = [other.getAttribute('x'), other.getAttribute('y'), other.getAttribute('w'), other.getAttribute('h')]

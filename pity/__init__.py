@@ -93,6 +93,7 @@ class Game(Bindable):
 		self.trigger('start')
 		keysDown = []
 		while (1):
+			self.trigger('begin-step')
 			self.clock.tick(dfps)
 
 			keys = pygame.key.get_pressed() # Write down keys
@@ -118,3 +119,4 @@ class Game(Bindable):
 
 			pygame.display.flip()
 			self.fps = self.clock.get_fps()
+			self.trigger('end-step')

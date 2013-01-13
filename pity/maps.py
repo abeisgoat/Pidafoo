@@ -42,7 +42,7 @@ class Map(object):
 
 			self.chunks[layer] = grid.split([self.chunkSize, self.chunkSize])
 
-			print "Broke map into %s chunks" % len(self.chunks), 'of size', self.chunkSize
+			print "Broke map into %s chunks" % len(self.chunks[layer]), 'of size', self.chunkSize
 
 			for r, chunksRow in enumerate(self.chunks[layer]):
 				row = self.actors.get(r, {})
@@ -58,14 +58,19 @@ class Map(object):
 
 		print 'Map has %i actors' % len(self.actors)
 		
-	def gridToActors(self, grid, layer=0, prefix='Block', actorType=None, offset=None):
+	def gridToActors(self, grid, layer=0, prefix='Block', actorType=None, offset=None, gridOffset=None):
 		if not offset:
 			offset = [0, 0]
+		if not gridOffset:
+			gridOffset = [0, 0]
 		actors = {}
 		if not actorType:
 			actorType = Actor
-		for y, row in enumerate( grid.getArray() ):
-			for x,block in enumerate( row ):
+		for by, row in enumerate( grid.getArray() ):
+			for bx,block in enumerate( row ):
+				y = by + gridOffset[1]
+				x = bx + gridOffset[0]
+
 				aid = prefix + '-%ix%ix%i' % (x, y, int(layer))
 
 				#if block in self.actors:
@@ -110,8 +115,8 @@ class Map(object):
 					else:
 						aBlock.setAttribute('w', w*self.blockSize)
 						aBlock.setAttribute('h', h*self.blockSize)
-						aBlock.setAttribute('x', x*self.blockSize+ offset[0])
-						aBlock.setAttribute('y', y*self.blockSize+ offset[1])
+						aBlock.setAttribute('x', (x*self.blockSize)+ offset[0])
+						aBlock.setAttribute('y', (y*self.blockSize)+ offset[1])
 
 						aBlock.setAttribute('solid', self.blocks[block].solid)
 						aBlock.setAttribute('color', self.blocks[block].color)
@@ -213,14 +218,21 @@ class Map(object):
 		print 'Setting up segment'
 		for layer in range(0, len(self.chunks)):
 			layer = str(layer)
-			for x in range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1):
-				for y in range(self.activeChunkY-self.chunkRange, self.activeChunkY+self.chunkRange+1):
+			x_range = range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1)
+			y_range = range(self.activeChunkY-self.chunkRange, self.activeChunkY+self.chunkRange+1)
+			x_diff = -(self.activeChunkX-self.chunkRange)
+			y_diff = -(self.activeChunkY-self.chunkRange)
+			print x_range, y_range, x_diff, y_diff
+			for x in x_range:
+				for y in y_range:
 					if x >= 0 and y >= 0 and x < len(self.actors[0].keys()) and y < len(self.actors):
 						grid = self.chunks[layer][y][x]
-						segment.paint(grid, x*self.chunkSize, y*self.chunkSize)
+						#segment.paint(grid, (x+x_diff)*self.chunkSize, (y+y_diff)*self.chunkSize)
+						segment.paint(grid, (x)*self.chunkSize, (y)*self.chunkSize)
 
 			print 'Generating new actors for layer %s' % layer
-			actors = self.gridToActors(segment, layer=int(layer))
+			if layer is '0': print segment
+			actors = self.gridToActors(segment, layer=int(layer))#, gridOffset=[-x_diff, -y_diff])
 			self.chunkRangeActors.update(actors)
 		return True
 

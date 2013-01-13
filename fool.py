@@ -33,11 +33,6 @@ class Graphics(object):
 			for effect in effects:
 				layers[effect.layer].append(effect)
 
-		'''
-		for actorID in game.existence.map.getActors():
-			actor = game.existence.map.getActor(actorID)
-			layers[actor.layer].append(actor)'''
-
 		return layers
 
 	def draw(self, game, sprite, rect):
