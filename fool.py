@@ -15,6 +15,7 @@ class Graphics(object):
 		self.screenSize = screenSize
 		self.centerActor = centerActor
 		self.viewport = [-64, -64, self.screenSize[0]+128, self.screenSize[1]+128]
+		self.borderViewport = [-32, -32, self.screenSize[0]+64, self.screenSize[1]+64]
 		self.tightViewport = [0, 0, self.screenSize[0], self.screenSize[1]]
 		self.static = pygame.Surface((11*3*32, 11*3*32))
 
@@ -32,9 +33,10 @@ class Graphics(object):
 			for effect in effects:
 				layers[effect.layer].append(effect)
 
+		'''
 		for actorID in game.existence.map.getActors():
 			actor = game.existence.map.getActor(actorID)
-			layers[actor.layer].append(actor)
+			layers[actor.layer].append(actor)'''
 
 		return layers
 
@@ -42,7 +44,7 @@ class Graphics(object):
 		game.screen.blit(sprite, rect)
 
 	def isActive(self, actorRect, viewport):
-		return interactions.over(actorRect, viewport)
+		return interactions.above(actorRect, viewport)
 
 	def getSprite(self, actor):
 		return actor.getSprite()
@@ -62,9 +64,13 @@ class Graphics(object):
 
 		layers = self.sortLayers(game)
 
+		actors = 0
+		activeCount = 0
+
 		# Loop through all our actors
 		for layer in layers:
 			for actor in layers[layer]:
+				actors += 1
 				# Draw the actors with the offset determined earlier
 				actorRect = [
 					actor.getAttribute('x')-offset[0], 
@@ -83,6 +89,7 @@ class Graphics(object):
 					viewport = self.viewport
 
 				if self.isActive(actorRect, viewport) or actor.fixed:
+					activeCount += 1
 					sprite = self.getSprite(actor)
 					actor.active = True
 					actorRect[0] -= actor.getAttribute('xoffset')
@@ -91,6 +98,8 @@ class Graphics(object):
 					self.draw(game, sprite, rect)
 				else:
 					actor.active = False
+
+		game.debug_active = (str(activeCount) + '/' + str(actors))
 
 		for overlayID in game.existence.overlays.getOverlays():
 			overlay = game.existence.overlays.getOverlay(overlayID)

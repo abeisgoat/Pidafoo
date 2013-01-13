@@ -85,6 +85,22 @@ class Interactions(object):
 		else:
 			return is_over
 
+	def above(self, aA, aB):
+		right_inside  	= aA[0]+aA[2] >= aB[0]
+		left_inside 	= aA[0] <= aB[0]+aB[2]
+		bottom_inside	= aA[1]+aA[3] >= aB[1]
+		top_inside 		= aA[1] <= aB[1]+aB[3]
+
+		right_outside  	= aA[0]+aA[2] >= aB[0]+aB[2]
+		left_outside 	= aA[0] <= aB[0]
+		bottom_outside	= aA[1]+aA[3] >= aB[1]+aB[3]
+		top_outside 	= aA[1] <= aB[1]
+
+		horizontal = (right_inside and not right_outside) or (left_inside and not left_outside) or (left_outside and right_outside)
+		vertical = (bottom_inside and not bottom_outside) or (top_inside and not top_outside) or (top_outside and bottom_outside)
+
+		return horizontal and vertical
+
 	def under(self, aA, aB):
 		x_range = range(aA.getAttribute('x'), aA.getAttribute('x')+aA.getAttribute('w'))
 		y_range = range(aA.getAttribute('y'), aA.getAttribute('y')+aA.getAttribute('h'))
