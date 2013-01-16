@@ -67,10 +67,25 @@ class Game(Bindable):
 		sys.path.remove(blocksPath)
 		return blocks
 
+	def getLevelsFromSet(self):
+		blocksPath = os.path.join('datasets', self.dataset, 'levels')
+		blocksGlob = os.path.join(blocksPath, '*.py')
+		sys.path.insert(0, blocksPath)
+		blocks = {}
+
+		for blockfile in glob.glob(blocksGlob):
+			filename = os.path.split(blockfile)[1]
+			module = os.path.splitext(filename)[0]
+			block = __import__(module)
+			blocks[ module ] = block
+
+		sys.path.remove(blocksPath)
+		return blocks
+
 	def getDataFromSet(self, fntype, fileID):
 		fntype_exts = {
 			'sprites': '.png', 
-			'maps': '.grid',
+			'grids': '.grid',
 			'sounds': '.ogg'
 		}
 		filename = fileID + fntype_exts[fntype]
