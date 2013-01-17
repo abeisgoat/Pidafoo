@@ -109,7 +109,7 @@ class Traitful(object):
 		self.trigger('step')
 
 class Stat(object):
-	def __init__(self, current=0, min=None, max=None):
+	def __init__(self, current=0, min=None, max=None, on_max=None, on_min=None):
 		self.min = min
 		self.max = max
 		self.set(current)

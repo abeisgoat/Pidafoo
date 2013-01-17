@@ -20,6 +20,9 @@ class Overlays(Bindable):
 		self.trigger('add overlay')
 		self.overlays[overlay.id] = overlay
 
+	def setOverlay(self, overlay):
+		self.overlays[overlay.id] = overlay
+
 	def removeOverlay(self, overlayID):
 		self.trigger('remove overlay')
 		self.overlays.pop(overlayID)
