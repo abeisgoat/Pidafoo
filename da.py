@@ -8,14 +8,14 @@ import pygame
 class Animated(object):
 	def __init__(self, maps=None, default=None, framerate=30, hidden=False):
 		if maps is None:
-			self.maps = {}
+			self.setAttribute('maps', {})
 		else:
-			self.maps = maps
+			self.setAttribute('maps', maps)
 
 		if not default is None:
 			self.setAnimation(default)
 		else:
-			self.currentMapID = None
+			self.setAttribute('currentMapID', None)
 
 		self.assets = {}
 
@@ -28,13 +28,15 @@ class Animated(object):
 		self.setHidden(hidden)
 
 	def requestAnimation(self, animation):
-		if 'priority' in self.maps[self.currentMapID]:
-			cPriority = self.maps[self.currentMapID]['priority']
+		maps = self.getAttribute('maps')
+		currentMapID = self.getAttribute('currentMapID')
+		if 'priority' in maps[currentMapID]:
+			cPriority = maps[currentMapID]['priority']
 		else:
 			cPriority = 0
 
-		if 'priority' in self.maps[animation]:
-			rPriority = self.maps[animation]['priority']
+		if 'priority' in maps[animation]:
+			rPriority = maps[animation]['priority']
 		else:
 			rPriority = 0
 
@@ -45,20 +47,21 @@ class Animated(object):
 			return False	
 
 	def setAnimation(self, animation):
-		currentMapID = self.currentMapID
+		currentMapID = self.getAttribute('currentMapID')
 		transition = '%s > %s' % (currentMapID, animation)
+		maps = self.getAttribute('maps')
 
 		if not self.getAnimation() is animation:
 			self.frame = 0
 
-			if transition in self.maps:
+			if transition in maps:
 				self.quenedMapID = animation
-				self.currentMapID = transition
-				self.trigger('transition-set', {'transition': self.currentMapID})
+				self.setAttribute('currentMapID', transition)
+				self.trigger('transition-set', {'transition': currentMapID})
 			else:
 				self.quenedMapID = None
-				self.currentMapID = animation
-				self.trigger('animation-set', {'animation': self.currentMapID})
+				self.setAttribute('currentMapID', animation)
+				self.trigger('animation-set', {'animation': currentMapID})
 
 	def setHidden(self, hidden):
 		if hidden and not self.getAttribute('hidden'):
@@ -68,7 +71,7 @@ class Animated(object):
 		self.setAttribute('hidden', hidden)
 
 	def getAnimation(self):
-		return self.currentMapID
+		return self.getAttribute('currentMapID')
 
 	def resetAnimation(self):
 		self.frame = 0
@@ -78,13 +81,14 @@ class Animated(object):
 		return self.quenedMapID
 
 	def setAnimationMaps(self, maps):
-		self.maps = maps
+		self.setAttribute('maps', maps)
 
 	def loadAsset(self, mapID, childID=None):
+		maps = self.getAttribute('maps')
 		if childID is None:
-			cMap = self.maps[mapID]
+			cMap = maps[mapID]
 		else:
-			cMap = self.maps[mapID]['children'][childID]
+			cMap = maps[mapID]['children'][childID]
 
 		spriteWidth = cMap['width']
 		spriteHeight = cMap['height']
@@ -145,10 +149,11 @@ class Animated(object):
 			return self.assets[mapID], self.assets[mapID + '_flipped']
 
 	def getMap(self, mapID):
-		if mapID in self.maps:
-			return self.maps[self.currentMapID]
+		maps = self.getAttribute('maps')
+		if mapID in maps:
+			return maps[self.getAttribute('currentMapID')]
 		else:
-			raise Exception('No animation map with name "%s"' % mapID)
+			raise Exception('No animation map with name "%s" on actor of type %i' % (mapID, self.getAttribute('type')))
 
 	def setLayer(self, layer):
 		self.layer = layer
@@ -160,28 +165,30 @@ class Animated(object):
 		if not type:
 			type = aChild.id
 		self.children[type] = {'actor': aChild, 'x': xy[0], 'y': xy[1]}
-		for mapID in self.maps:
+		maps = self.getAttribute('maps')
+		for mapID in maps:
 			if mapID in aChild.maps:
-				children = self.maps[mapID].get('children', {})
+				children = maps[mapID].get('children', {})
 				children[mapID] = aChild.maps[mapID]
 				children[mapID]['x'] = xy[0]
 				children[mapID]['y'] = xy[1]
-				self.maps[mapID]['children'] = children
+				maps[mapID]['children'] = children
 				if mapID in self.assets:
 					self.renderSprite(mapID)
 
 	def renderSprite(self, mapID):
+		maps = self.getAttribute('maps')
 		for frame in range(0, len(self.assets[mapID])):
 			surface 		= self.assets[mapID][frame]
 			surfaceFlipped 	= self.assets[mapID + '_flipped'][frame]
-			for childID in self.maps[mapID]['children']:
-				childMap = self.maps[mapID]['children'][childID]
+			for childID in maps[mapID]['children']:
+				childMap = maps[mapID]['children'][childID]
 				self.loadAsset(mapID, childID) # This should be replaced with a reference to a standard resource bank
 				alignment = 'none' if not 'align' in childMap else childMap['align']
 
 				mapSizeDiff = [
-					self.maps[mapID]['width']-childMap['width'], 
-					self.maps[mapID]['height']-childMap['height']
+					maps[mapID]['width']-childMap['width'], 
+					maps[mapID]['height']-childMap['height']
 				]
 
 				# Draw normal
@@ -210,9 +217,9 @@ class Animated(object):
 	def getSprite(self):
 		if self.getAttribute('hidden'):
 			return pygame.Surface((0,0))
-		elif not self.currentMapID is None:
-			cMap = self.getMap(self.currentMapID)
-			cAssets, cAssetsFlipped = self.getAssets(self.currentMapID)
+		elif not self.getAttribute('currentMapID') is None:
+			cMap = self.getMap(self.getAttribute('currentMapID'))
+			cAssets, cAssetsFlipped = self.getAssets(self.getAttribute('currentMapID'))
 			width = self.getAttribute('w')
 			height = self.getAttribute('h')
 			flipped = self.getAttribute('flipped')
@@ -233,7 +240,7 @@ class Animated(object):
 				self.frame += 1
 				return sprite
 			else:
-				self.trigger('animation-end', {'animation': self.currentMapID})
+				self.trigger('animation-end', {'animation': self.getAttribute('currentMapID')})
 				if cMap['end'] == 'loop':
 					self.frame = 0
 				elif cMap['end'] == 'quened':

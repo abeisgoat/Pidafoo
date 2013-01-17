@@ -109,8 +109,10 @@ class Map(object):
 					actions 		= self.blocks[block].actions
 					reactions 		= self.blocks[block].reactions
 					attributes 		= self.blocks[block].attributes
+					generator 		= getattr(self.blocks[block], 'generator', None)
 
 					if aBlock.id in self.consistentActors:
+						print 'Loading consistent'
 						aBlock.attributes = self.consistentActors[aBlock.id]
 					else:
 						aBlock.setAttribute('w', w*self.blockSize)
@@ -134,8 +136,17 @@ class Map(object):
 							ma = s['max'] if 'max' in s else None
 							aBlock.addStat(stat, value=value, min=mi, max=ma)
 
-					if aBlock.getAttribute('consistent'):
-						self.consistentActors[aBlock.id] = aBlock.attributes
+						if hasattr(self.blocks[block], 'animationMaps'):
+							animationMaps = self.blocks[block].animationMaps
+							aBlock.setAnimationMaps(animationMaps)
+							
+							currentMapID = aBlock.getAttribute('currentMapID')
+							if currentMapID:
+								print 'setting cmap', currentMapID
+								aBlock.setAnimation(currentMapID)
+							else:
+								aBlock.setAnimation('default')
+
 
 					persistant = False
 					if aBlock.getAttribute('persistant'):
@@ -160,17 +171,6 @@ class Map(object):
 						print 'setting aID', aid
 						aBlock.id = aID
 
-					if hasattr(self.blocks[block], 'animationMaps'):
-						animationMaps = self.blocks[block].animationMaps
-						aBlock.setAnimationMaps(animationMaps)
-						
-						currentMapID = aBlock.getAttribute('currentMapID')
-						if currentMapID:
-							print 'setting cmap', currentMapID
-							aBlock.setAnimation(currentMapID)
-						else:
-							aBlock.setAnimation('default')
-
 					for interaction in interactions:
 						aBlock.addInteraction(interaction, interactions[interaction])
 
@@ -190,8 +190,18 @@ class Map(object):
 						aBlock.setAttribute(attribute, attributes[attribute])
 
 					aBlock.setActions(actions)
+
 					if not persistant:
 						actors[aBlock.id] = aBlock
+
+					if aBlock.getAttribute('consistent'):
+						if not aBlock.id in self.consistentActors and generator:
+							aBlock = generator(aBlock)
+						self.consistentActors[aBlock.id] = aBlock.attributes
+					else:
+						if generator:
+							aBlock = generator(aBlock)
+
 		return actors
 
 	def getActors(self):
