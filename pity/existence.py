@@ -58,7 +58,7 @@ class Existence(Bindable):
 
 			if not a.trash:
 				if not a.prioritizedInteractions:
-					a.prioritizedInteractions = sorted(a.interactions, key=interactionKey)
+					a.prioritizedInteractions = sorted(a.getAttribute('interactions'), key=interactionKey)
 
 				for interaction in a.prioritizedInteractions:
 					ia = utils.parseInteraction(interaction)

@@ -146,6 +146,9 @@ class Map(object):
 							else:
 								aBlock.setAnimation('default')
 
+						for interaction in interactions:
+							aBlock.addInteraction(interaction, interactions[interaction])
+
 
 					persistant = False
 					if aBlock.getAttribute('persistant'):
@@ -169,9 +172,6 @@ class Map(object):
 					if aID:
 						print 'setting aID', aid
 						aBlock.id = aID
-
-					for interaction in interactions:
-						aBlock.addInteraction(interaction, interactions[interaction])
 
 					for binding in bindings:
 						b = bindings[binding]
