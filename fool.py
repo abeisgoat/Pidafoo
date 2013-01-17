@@ -96,7 +96,14 @@ class Graphics(object):
 
 		game.debug_active = (str(activeCount) + '/' + str(actors))
 
+		oLayers = {}
 		for overlayID in game.existence.overlays.getOverlays():
 			overlay = game.existence.overlays.getOverlay(overlayID)
-			rect = Rect(overlay.getAttribute('x'), overlay.getAttribute('y'), overlay.getAttribute('w'), overlay.getAttribute('h'))
-			game.screen.blit(overlay.getSprite(), rect)
+			l = oLayers.get(overlay.layer, [])
+			l.append(overlay)
+			oLayers[overlay.layer] = l
+
+		for layer in oLayers:
+			for overlay in oLayers[layer]:
+				rect = Rect(overlay.getAttribute('x'), overlay.getAttribute('y'), overlay.getAttribute('w'), overlay.getAttribute('h'))
+				game.screen.blit(overlay.getSprite(), rect)

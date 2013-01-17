@@ -9,7 +9,7 @@ class Traitful(object):
 		self.events = {}
 		self.reactions = {}
 		self.statuses = []
-		self.bind('change-stat', self.react)
+		self.bind('change-stat-base', self.react)
 
 	def setStatus(self, status):
 		if not status in self.statuses:
@@ -32,12 +32,12 @@ class Traitful(object):
 		self.setAttribute('stats', stats)
 
 	def setStat(self, statID, value):
-		print statID, value
-		data = {'stat': statID, 'current': value, 'previous': self.getStat(statID)}
+		old = self.getStat(statID)
 		result = self.getAttribute('stats')[statID].set(value)
+		data = {'stat': statID, 'current': self.getStat(statID), 'previous': old}
 		if result:
-			self.trigger('change-stat %s' % statID, data)
-			self.trigger('change-stat', data)
+			self.trigger('change-stat-base %s' % statID, data)
+			self.trigger('change-stat-base', data)
 			return True
 		else:
 			return False
@@ -75,6 +75,9 @@ class Traitful(object):
 
 	def addStatModifier(self, mod):
 		self.statModifiers[mod.id] = mod
+		for influenced in mod.influences:
+			data = {'stat': influenced, 'current': self.getStat(influenced)}
+			self.trigger('change-stat %s' % influenced, data)
 
 	def hasStatModifierType(self, modType):
 		if modType != None:
@@ -118,6 +121,12 @@ class Stat(object):
 		isAboveMin = value == max(value, self.min) or self.min == None
 		if isAboveMin and isBelowMax:
 			self.current = value
+			return True
+		elif not isAboveMin:
+			self.current = self.min
+			return True
+		elif not isBelowMax:
+			self.current = self.max
 			return True
 		else:
 			return False

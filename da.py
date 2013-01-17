@@ -117,7 +117,11 @@ class Animated(object):
 					sprite = pygame.Surface(spriteSize, flags=pygame.SRCALPHA)
 					sprite.blit(surface, (0, 0), [c*spriteWidth, r*spriteHeight, (c+1)*spriteWidth, (r+1)*spriteHeight])
 				else:
-					sprite = pygame.Surface([self.getAttribute('w'), self.getAttribute('h')], flags=pygame.SRCALPHA)
+					try:
+						sprite = pygame.Surface([self.getAttribute('w'), self.getAttribute('h')], flags=pygame.SRCALPHA)
+					except pygame.error:
+						raise Exception("%s has invalid size of %ix%i" % (self.id, self.getAttribute('w'), self.getAttribute('h')))
+
 					for xrp in range(0, self.getAttribute('w')/spriteWidth):
 						for yrp in range(0, self.getAttribute('h')/spriteHeight):
 							sprite.blit(surface, (spriteWidth*xrp, spriteHeight*yrp), [c*spriteWidth, r*spriteHeight, (c+1)*spriteWidth, (r+1)*spriteHeight])
