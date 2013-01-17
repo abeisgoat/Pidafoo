@@ -109,4 +109,21 @@ class Interactions(object):
 			aB.getAttribute('y') + (aB.getAttribute('h')/2),
 		]
 		return b_center[0] in x_range and b_center[1] in y_range
+
+	def see(self, aA, aB):
+		aAxy = [aA.getAttribute('x'), aA.getAttribute('y'), aA.getAttribute('w'), aA.getAttribute('h')]
+		aBxy = [aB.getAttribute('x'), aB.getAttribute('y'), aB.getAttribute('w'), aB.getAttribute('h')]
+		aAcenter = [aAxy[0] + (aAxy[2]/2), aAxy[1] + (aAxy[3]/2)]
+		aBcenter = [aBxy[0] + (aBxy[2]/2), aBxy[1] + (aBxy[3]/2)]
+
+		return utils.distance(aAcenter, aBcenter) <= aA.getAttribute('sight-range')
+
+	def reach(self, aA, aB):
+		aAxy = [aA.getAttribute('x'), aA.getAttribute('y'), aA.getAttribute('w'), aA.getAttribute('h')]
+		aBxy = [aB.getAttribute('x'), aB.getAttribute('y'), aB.getAttribute('w'), aB.getAttribute('h')]
+		aAcenter = [aAxy[0] + (aAxy[2]/2), aAxy[1] + (aAxy[3]/2)]
+		aBcenter = [aBxy[0] + (aBxy[2]/2), aBxy[1] + (aBxy[3]/2)]
+
+		return utils.distance(aAcenter, aBcenter) <= aA.getAttribute('attack-range')
+
 interactions = Interactions()
