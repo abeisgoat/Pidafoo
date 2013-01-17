@@ -44,15 +44,21 @@ class Traitful(object):
 
 	def getStat(self, statID):
 		stat = self.getAttribute('stats').get(statID, None)
+		c = self.getBaseStat(statID)
+		# Apply all modifiers to the stat
+		for mod in self.statModifiers:
+			mod = self.statModifiers[mod]
+			c = mod.ify(statID, c)
+		return c
+
+	def getBaseStat(self, statID):
+		stat = self.getAttribute('stats').get(statID, None)
 		if not stat is None:
 			c = stat.current
-			# Apply all modifiers to the stat
-			for mod in self.statModifiers:
-				mod = self.statModifiers[mod]
-				c = mod.ify(statID, c)
 			return c
 		else:
-			return None
+			return 0
+
 
 	def getStats(self):
 		return self.getAttribute('stats')

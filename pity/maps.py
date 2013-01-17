@@ -112,7 +112,6 @@ class Map(object):
 					generator 		= getattr(self.blocks[block], 'generator', None)
 
 					if aBlock.id in self.consistentActors:
-						print 'Loading consistent'
 						aBlock.attributes = self.consistentActors[aBlock.id]
 					else:
 						aBlock.setAttribute('w', w*self.blockSize)

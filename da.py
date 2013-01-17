@@ -167,9 +167,10 @@ class Animated(object):
 		self.children[type] = {'actor': aChild, 'x': xy[0], 'y': xy[1]}
 		maps = self.getAttribute('maps')
 		for mapID in maps:
-			if mapID in aChild.maps:
+			childMaps = aChild.getAttribute('maps')
+			if mapID in childMaps:
 				children = maps[mapID].get('children', {})
-				children[mapID] = aChild.maps[mapID]
+				children[mapID] = childMaps[mapID]
 				children[mapID]['x'] = xy[0]
 				children[mapID]['y'] = xy[1]
 				maps[mapID]['children'] = children
