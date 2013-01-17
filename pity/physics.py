@@ -11,14 +11,10 @@ class Physics(object):
 			actor.increaseAttribute('y', yChange)
 
 	def adjustForces(self, actor, other, data):
-		#print 'Adjusting physics for', actor.id
-		aBoxF = [actor.getAttribute('x')+actor.getAttribute('forceX'), actor.getAttribute('y')+actor.getAttribute('forceY'), actor.getAttribute('w'), actor.getAttribute('h')]
-		aBox = [actor.getAttribute('x'), actor.getAttribute('y'), actor.getAttribute('w'), actor.getAttribute('h')]
-		oBox = [other.getAttribute('x'), other.getAttribute('y'), other.getAttribute('w'), other.getAttribute('h')]
-		is_over = interactions.over(aBoxF, oBox)
+		is_over = interactions.over(actor, other, aOffset=[actor.getAttribute('forceX'), actor.getAttribute('forceY')])
 		if other.getAttribute('solid'):
 			if is_over:
-				io, diff = interactions.over(aBox, oBox, return_difference=True)
+				io, diff = interactions.over(actor, other, return_difference=True)
 
 				ctX = utils.closerTo([diff[0], actor.getAttribute('forceX')], 0)
 				ctY = utils.closerTo([diff[1], actor.getAttribute('forceY')], 0)

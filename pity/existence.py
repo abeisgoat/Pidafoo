@@ -29,9 +29,11 @@ class Existence(Bindable):
 		self.overlays = Overlays(overlays)
 		self.map = Map(gridset)
 		self.paused = False
+		self.dirty = False
 		self.__selectors_cache__ = {}
 
 	def loadActors(self):
+		self.dirty = True
 		print 'Loading Actors'
 		for actorID,actor in self.map.getExpiredActors().items():
 			if self.hasActor(actorID) and not actor.getAttribute('persistant'):
@@ -61,7 +63,11 @@ class Existence(Bindable):
 					a.prioritizedInteractions = sorted(a.getAttribute('interactions'), key=interactionKey)
 
 				for interaction in a.prioritizedInteractions:
-					ia = utils.parseInteraction(interaction)
+					if not interaction in a.parsedInteractions:
+						ia = utils.parseInteraction(interaction)
+						a.parsedInteractions[interaction] = ia
+					else:
+						ia = a.parsedInteractions[interaction]
 
 					if hasattr(interactions, ia['action']):
 						ia_check = interactions.get(ia['action'])
@@ -118,7 +124,7 @@ class Existence(Bindable):
 		for actorID in self.actors:
 			other = self.getActor(actorID)
 			if not other is actor:
-				over = interactions.over(other, point)
+				over = interactions.over(other, actor, bOffset=relative_point)
 				if over:
 					interaction 				= '%s %s' % (action, other.id)
 					interactionGroup  			= '%s group:%s'  % (action, other.getAttribute('group'))

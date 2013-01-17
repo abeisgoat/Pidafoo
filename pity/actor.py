@@ -41,6 +41,7 @@ class Actor(Stateful, Traitful, Animated):
 		self.effectsQuene = []
 
 		self.prioritizedInteractions = False
+		self.parsedInteractions = {}
 
 	def act(self, action):
 		if action in self.actions:
@@ -76,12 +77,10 @@ class Actor(Stateful, Traitful, Animated):
 	def setAttribute(self, attribute, value):
 		data = {
 			'attribute': attribute,
-			'valuePrevious': self.attributes.get(attribute, None),
 			'valueCurrent': value,
 		}
 		self.attributes[attribute] = value
-		if data['valuePrevious'] != data['valueCurrent']:
-			self.trigger('change %s' % attribute, data)
+		self.trigger('change %s' % attribute, data)
 
 	def hasAttribute(self, attribute):
 		return attribute in self.attributes

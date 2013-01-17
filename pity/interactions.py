@@ -12,6 +12,9 @@ class Interactions(object):
 			return False
 
 	def near(self, aA, aB):
+		return True	
+		#return self.under(aA, aB, padding=128)
+		'''
 		dist = 0
 		half_dist = dist/2
 		# Here we expand the boxes for the actors by half dist in each direction
@@ -48,22 +51,27 @@ class Interactions(object):
 			return True
 		else:
 			return False
+		'''
 
-	def over(self, aA, aB, return_difference=False):
+	def over(self, aA, aB, return_difference=False, aOffset=None, bOffset=None):
+		if not aOffset:
+			aOffset = [0, 0]
+		if not bOffset:
+			bOffset = [0, 0]
+
 		near = self.near(aA, aB)
 		if not near: 
-			print 'near'
 			return False
 
-		if isinstance(aA, Actor):
-			aAxy = utils.actorToList(aA)
-		else:
-			aAxy = aA
+		aAxy = utils.actorToList(aA)
 
-		if isinstance(aB, Actor):
-			aBxy = utils.actorToList(aA)
-		else:
-			aBxy = aB
+		aAxy[0] += aOffset[0]
+		aAxy[1] += aOffset[1]
+
+		aBxy = utils.actorToList(aB)
+
+		aBxy[0] += bOffset[0]
+		aBxy[1] += bOffset[1]
 
 		aABox = [
 				xrange(aAxy[0], aAxy[0]+aAxy[2]),
@@ -101,9 +109,9 @@ class Interactions(object):
 
 		return horizontal and vertical
 
-	def under(self, aA, aB):
-		x_range = range(aA.getAttribute('x'), aA.getAttribute('x')+aA.getAttribute('w'))
-		y_range = range(aA.getAttribute('y'), aA.getAttribute('y')+aA.getAttribute('h'))
+	def under(self, aA, aB, padding=0):
+		x_range = range(aA.getAttribute('x')-padding, aA.getAttribute('x')+aA.getAttribute('w')+padding)
+		y_range = range(aA.getAttribute('y')-padding, aA.getAttribute('y')+aA.getAttribute('h')+padding)
 		b_center = [
 			aB.getAttribute('x') + (aB.getAttribute('w')/2),
 			aB.getAttribute('y') + (aB.getAttribute('h')/2),
