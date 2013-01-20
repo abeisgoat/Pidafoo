@@ -77,6 +77,7 @@ class Actor(Stateful, Traitful, Animated):
 	def setAttribute(self, attribute, value):
 		data = {
 			'attribute': attribute,
+			'valueOld': self.attributes.get(attribute, False),
 			'valueCurrent': value,
 		}
 		self.attributes[attribute] = value
