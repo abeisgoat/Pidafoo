@@ -48,7 +48,7 @@ class Existence(Bindable):
 		print 'Loaded actors total (%i)' % len(self.actors)
 
 		self.__selectors_cache__ = {}
-	@profile
+
 	def step(self):
 		trashcan = []
 
@@ -126,9 +126,9 @@ class Existence(Bindable):
 				over = interactions.over(other, actor, bOffset=relative_point)
 				if over:
 					interaction 				= '%s %s' % (action, other.id)
-					interactionGroup  			= '%s group:%s'  % (action, other.getAttribute('group'))
+					interactionGroup  			= '%s group:%s'  % (action, other.attributes['group'])
 					interactionResponse 		= '%s from %s' % (action, actor.id) 
-					interactionResponseGroup 	= '%s from group:%s' % (action, actor.getAttribute('group'))
+					interactionResponseGroup 	= '%s from group:%s' % (action, actor.attributes['group'])
 					actor.interact(interaction, other)
 					actor.interact(interactionGroup, other)
 					other.interact(interactionResponse, actor)

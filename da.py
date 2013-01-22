@@ -220,14 +220,14 @@ class Animated(object):
 
 
 	def getSprite(self):
-		if self.getAttribute('hidden'):
+		if self.attributes['hidden']:
 			return pygame.Surface((0,0))
-		elif not self.getAttribute('currentMapID') is None:
-			cMap = self.getMap(self.getAttribute('currentMapID'))
-			cAssets, cAssetsFlipped = self.getAssets(self.getAttribute('currentMapID'))
-			width = self.getAttribute('w')
-			height = self.getAttribute('h')
-			flipped = self.getAttribute('flipped')
+		elif not self.attributes['currentMapID'] is None:
+			cMap = self.getMap(self.attributes['currentMapID'])
+			cAssets, cAssetsFlipped = self.getAssets(self.attributes['currentMapID'])
+			width = self.attributes['w']
+			height = self.attributes['h']
+			flipped = self.attributes['flipped']
 
 			if flipped:
 				cAssets = cAssetsFlipped
@@ -261,17 +261,17 @@ class Animated(object):
 		else:
 			#print 'No animation set for actor "%s"' % (self.id)
 			if self.hasAttribute('color'):
-				color = self.getAttribute('color')
+				color = self.attributes['color']
 			else:
 				color = 'red'
 
 			if self.hasAttribute('w'):
-				w = self.getAttribute('w')
+				w = self.attributes['w']
 			else:
 				w = 32
 
 			if self.hasAttribute('h'):
-				h = self.getAttribute('h')
+				h = self.attributes['h']
 			else:
 				h = 32
 

@@ -53,8 +53,8 @@ class Graphics(object):
 
 		# Sort out how much we need to shift stuff to keep the player centered
 		offset = [
-			ca.getAttribute('x')-((self.screenSize[0]-ca.getAttribute('w'))/2), 
-			ca.getAttribute('y')-((self.screenSize[1]-ca.getAttribute('h'))/2)
+			ca.attributes['x']-((self.screenSize[0]-ca.attributes['w'])/2), 
+			ca.attributes['y']-((self.screenSize[1]-ca.attributes['h'])/2)
 		]
 
 		layers = self.sortLayers(game)
@@ -68,10 +68,10 @@ class Graphics(object):
 				actors += 1
 				# Draw the actors with the offset determined earlier
 				actorRect = [
-					actor.getAttribute('x')-offset[0], 
-					actor.getAttribute('y')-offset[1], 
-					actor.getAttribute('w'), 
-					actor.getAttribute('h')
+					actor.attributes['x']-offset[0], 
+					actor.attributes['y']-offset[1], 
+					actor.attributes['w'], 
+					actor.attributes['h']
 				]
 
 				group = actor.getAttribute('group')

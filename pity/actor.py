@@ -14,6 +14,8 @@ class Actor(Stateful, Traitful, Animated):
 				'y': 0,
 				'w': 10,
 				'h': 10,
+				'forceX': 0,
+				'forceY': 0,
 				'flipped': False
 			}
 		else:
@@ -57,7 +59,7 @@ class Actor(Stateful, Traitful, Animated):
 		self.actions.remove(actionID)
 
 	def interact(self, interaction, other, data=None):
-		interactions = self.getAttribute('interactions')
+		interactions = self.attributes['interactions']
 		if interaction in interactions:
 			self.trigger('interact %s' % (interaction))
 			interactions[interaction](self, other, data)

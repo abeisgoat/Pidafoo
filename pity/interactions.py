@@ -6,7 +6,7 @@ class Interactions(object):
 		return getattr(self, interaction)
 
 	def touch(self, aA, aB):
-		if aA.getAttribute('x') is aB.getAttribute('x') and aA.getAttribute('y') is aB.getAttribute('y'):
+		if aA.attributes['x'] is aB.attributes['x'] and aA.attributes['y'] is aB.attributes['y']:
 			return True
 		else:
 			return False
@@ -110,25 +110,25 @@ class Interactions(object):
 		return horizontal and vertical
 
 	def under(self, aA, aB, padding=0):
-		x_range = range(aA.getAttribute('x')-padding, aA.getAttribute('x')+aA.getAttribute('w')+padding)
-		y_range = range(aA.getAttribute('y')-padding, aA.getAttribute('y')+aA.getAttribute('h')+padding)
+		x_range = range(aA.attributes['x']-padding, aA.attributes['x']+aA.attributes['w']+padding)
+		y_range = range(aA.attributes['y']-padding, aA.attributes['y']+aA.attributes['h']+padding)
 		b_center = [
-			aB.getAttribute('x') + (aB.getAttribute('w')/2),
-			aB.getAttribute('y') + (aB.getAttribute('h')/2),
+			aB.attributes['x'] + (aB.attributes['w']/2),
+			aB.attributes['y'] + (aB.attributes['h']/2),
 		]
 		return b_center[0] in x_range and b_center[1] in y_range
 
 	def see(self, aA, aB):
-		aAxy = [aA.getAttribute('x'), aA.getAttribute('y'), aA.getAttribute('w'), aA.getAttribute('h')]
-		aBxy = [aB.getAttribute('x'), aB.getAttribute('y'), aB.getAttribute('w'), aB.getAttribute('h')]
+		aAxy = [aA.attributes['x'], aA.attributes['y'], aA.attributes['w'], aA.attributes['h']]
+		aBxy = [aB.attributes['x'], aB.attributes['y'], aB.attributes['w'], aB.attributes['h']]
 		aAcenter = [aAxy[0] + (aAxy[2]/2), aAxy[1] + (aAxy[3]/2)]
 		aBcenter = [aBxy[0] + (aBxy[2]/2), aBxy[1] + (aBxy[3]/2)]
 
 		return utils.distance(aAcenter, aBcenter) <= aA.getAttribute('sight-range')
 
 	def reach(self, aA, aB):
-		aAxy = [aA.getAttribute('x'), aA.getAttribute('y'), aA.getAttribute('w'), aA.getAttribute('h')]
-		aBxy = [aB.getAttribute('x'), aB.getAttribute('y'), aB.getAttribute('w'), aB.getAttribute('h')]
+		aAxy = [aA.attributes['x'], aA.attributes['y'], aA.attributes['w'], aA.attributes['h']]
+		aBxy = [aB.attributes['x'], aB.attributes['y'], aB.attributes['w'], aB.attributes['h']]
 		aAcenter = [aAxy[0] + (aAxy[2]/2), aAxy[1] + (aAxy[3]/2)]
 		aBcenter = [aBxy[0] + (aBxy[2]/2), aBxy[1] + (aBxy[3]/2)]
 
