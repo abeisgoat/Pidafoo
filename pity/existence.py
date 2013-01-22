@@ -48,7 +48,7 @@ class Existence(Bindable):
 		print 'Loaded actors total (%i)' % len(self.actors)
 
 		self.__selectors_cache__ = {}
-
+	@profile
 	def step(self):
 		trashcan = []
 
@@ -74,9 +74,9 @@ class Existence(Bindable):
 
 						if 'other' in ia:
 							if ia['other'] != '*':
-								others = [ia['other']]
+								others = [self.actors[ia['other']]]
 							else:
-								others = self.actors.keys()
+								others = self.actors.values()
 
 						elif 'selectors' in ia:
 							for selector in ia['selectors']:
@@ -91,13 +91,12 @@ class Existence(Bindable):
 									for actor in self.actors:
 										a = self.getActor(actor)
 										if a.getAttribute(selector) == value:
-											others.append(actor)
+											others.append(a)
 									self.__selectors_cache__[selectorKey] = others
 
 						for other in others:
-							other = self.getActor(other)
-							if not other is a:
-								if (other.dirty or a.dirty) and (other.active and a.active):
+							if (other.dirty or a.dirty) and (other.active and a.active):
+								if not other is a:
 									if ia_check( a, other ):
 										a.interact(interaction, other, {'existence': self})
 										interactionResponse = '%s from %s' % (ia['action'], a.id)
