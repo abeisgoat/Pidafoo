@@ -28,8 +28,8 @@ class Animated(object):
 		self.setHidden(hidden)
 
 	def requestAnimation(self, animation):
-		maps = self.getAttribute('maps')
-		currentMapID = self.getAttribute('currentMapID')
+		maps = self.attributes['maps']
+		currentMapID = self.attributes['currentMapID']
 		if 'priority' in maps[currentMapID]:
 			cPriority = maps[currentMapID]['priority']
 		else:
@@ -47,9 +47,9 @@ class Animated(object):
 			return False	
 
 	def setAnimation(self, animation):
-		currentMapID = self.getAttribute('currentMapID')
+		currentMapID = self.attributes['currentMapID']
 		transition = '%s > %s' % (currentMapID, animation)
-		maps = self.getAttribute('maps')
+		maps = self.attributes['maps']
 
 		if not self.getAnimation() is animation:
 			self.frame = 0
@@ -64,14 +64,14 @@ class Animated(object):
 				self.trigger('animation-set', {'animation': currentMapID})
 
 	def setHidden(self, hidden):
-		if hidden and not self.getAttribute('hidden'):
+		if hidden and not self.attributes['hidden']:
 			self.trigger('hide')
-		elif not hidden and self.getAttribute('hidden'):
+		elif not hidden and self.attributes['hidden']:
 			self.trigger('show')
 		self.setAttribute('hidden', hidden)
 
 	def getAnimation(self):
-		return self.getAttribute('currentMapID')
+		return self.attributes['currentMapID']
 
 	def resetAnimation(self):
 		self.frame = 0
@@ -84,7 +84,7 @@ class Animated(object):
 		self.setAttribute('maps', maps)
 
 	def loadAsset(self, mapID, childID=None):
-		maps = self.getAttribute('maps')
+		maps = self.attributes['maps']
 		if childID is None:
 			cMap = maps[mapID]
 		else:
@@ -118,12 +118,12 @@ class Animated(object):
 					sprite.blit(surface, (0, 0), [c*spriteWidth, r*spriteHeight, (c+1)*spriteWidth, (r+1)*spriteHeight])
 				else:
 					try:
-						sprite = pygame.Surface([self.getAttribute('w'), self.getAttribute('h')], flags=pygame.SRCALPHA)
+						sprite = pygame.Surface([self.attributes['w'], self.attributes['h']], flags=pygame.SRCALPHA)
 					except pygame.error:
-						raise Exception("%s has invalid size of %ix%i" % (self.id, self.getAttribute('w'), self.getAttribute('h')))
+						raise Exception("%s has invalid size of %ix%i" % (self.id, self.attributes['w'], self.attributes['h']))
 
-					for xrp in range(0, self.getAttribute('w')/spriteWidth):
-						for yrp in range(0, self.getAttribute('h')/spriteHeight):
+					for xrp in range(0, self.attributes['w']/spriteWidth):
+						for yrp in range(0, self.attributes['h']/spriteHeight):
 							sprite.blit(surface, (spriteWidth*xrp, spriteHeight*yrp), [c*spriteWidth, r*spriteHeight, (c+1)*spriteWidth, (r+1)*spriteHeight])
 
 
@@ -153,11 +153,11 @@ class Animated(object):
 			return self.assets[mapID], self.assets[mapID + '_flipped']
 
 	def getMap(self, mapID):
-		maps = self.getAttribute('maps')
+		maps = self.attributes['maps']
 		if mapID in maps:
-			return maps[self.getAttribute('currentMapID')]
+			return maps[self.attributes['currentMapID']]
 		else:
-			raise Exception('No animation map with name "%s" on actor of type %i' % (mapID, self.getAttribute('type')))
+			raise Exception('No animation map with name "%s" on actor of type %i' % (mapID, self.attributes['type']))
 
 	def setLayer(self, layer):
 		self.layer = layer
@@ -169,9 +169,9 @@ class Animated(object):
 		if not type:
 			type = aChild.id
 		self.children[type] = {'actor': aChild, 'x': xy[0], 'y': xy[1]}
-		maps = self.getAttribute('maps')
+		maps = self.attributes['maps']
 		for mapID in maps:
-			childMaps = aChild.getAttribute('maps')
+			childMaps = aChild.attributes['maps']
 			if mapID in childMaps:
 				children = maps[mapID].get('children', {})
 				children[mapID] = childMaps[mapID]
@@ -182,7 +182,7 @@ class Animated(object):
 					self.renderSprite(mapID)
 
 	def renderSprite(self, mapID):
-		maps = self.getAttribute('maps')
+		maps = self.attributes['maps']
 		for frame in range(0, len(self.assets[mapID])):
 			surface 		= self.assets[mapID][frame]
 			surfaceFlipped 	= self.assets[mapID + '_flipped'][frame]
@@ -245,7 +245,7 @@ class Animated(object):
 				self.frame += 1
 				return sprite
 			else:
-				self.trigger('animation-end', {'animation': self.getAttribute('currentMapID')})
+				self.trigger('animation-end', {'animation': self.attributes['currentMapID']})
 				if cMap['end'] == 'loop':
 					self.frame = 0
 				elif cMap['end'] == 'quened':

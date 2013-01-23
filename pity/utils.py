@@ -45,6 +45,6 @@ class Utils(object):
 		return distance
 
 	def actorToList(self, actor):
-		return [actor.getAttribute('x'), actor.getAttribute('y'), actor.getAttribute('w'), actor.getAttribute('h')]
+		return [actor.attributes['x'], actor.attributes['y'], actor.attributes['w'], actor.attributes['h']]
 
 utils = Utils()

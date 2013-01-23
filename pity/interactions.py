@@ -63,12 +63,12 @@ class Interactions(object):
 		if not near: 
 			return False
 
-		aAxy = utils.actorToList(aA)
+		aAxy = [aA.attributes['x'], aA.attributes['y'], aA.attributes['w'], aA.attributes['h']]
 
 		aAxy[0] += aOffset[0]
 		aAxy[1] += aOffset[1]
 
-		aBxy = utils.actorToList(aB)
+		aBxy = [aB.attributes['x'], aB.attributes['y'], aB.attributes['w'], aB.attributes['h']]
 
 		aBxy[0] += bOffset[0]
 		aBxy[1] += bOffset[1]

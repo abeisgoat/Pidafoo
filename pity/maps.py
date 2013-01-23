@@ -139,7 +139,7 @@ class Map(object):
 							animationMaps = self.blocks[block].animationMaps
 							aBlock.setAnimationMaps(animationMaps)
 							
-							currentMapID = aBlock.getAttribute('currentMapID')
+							currentMapID = aBlock.attributes['currentMapID']
 							if currentMapID:
 								print 'setting cmap', currentMapID
 								aBlock.setAnimation(currentMapID)
@@ -151,16 +151,16 @@ class Map(object):
 
 
 					persistant = False
-					if aBlock.getAttribute('persistant'):
+					if aBlock.attributes.get('persistant', False):
 						pl = self.persistantActors.get(str(layer), {})
 						persistant = aBlock.id in pl
 						pl[aBlock.id] = aBlock
 						self.persistantActors[str(layer)] = pl
 
-					if not aBlock.getAttribute('expirable'):
+					if not aBlock.attributes.get('expirable', False):
 						self.nonExpirableActors[aBlock.id] = aBlock
 
-					l = aBlock.getAttribute('layer')
+					l = aBlock.attributes.get('layer', False)
 					if l:
 						aBlock.setLayer(l)
 					else:
@@ -168,7 +168,7 @@ class Map(object):
 
 					aBlock.dirty = True
 
-					aID = aBlock.getAttribute('id')
+					aID = aBlock.attributes.get('id', False)
 					if aID:
 						print 'setting aID', aid
 						aBlock.id = aID

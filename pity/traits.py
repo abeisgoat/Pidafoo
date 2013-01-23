@@ -24,8 +24,8 @@ class Traitful(object):
 
 	def addStat(self, statID, value=0, max=None, min=None):
 		self.trigger('add-stat %s' % statID)
-		stats = self.getAttribute('stats')
-		if not statID in self.getAttribute('stats'):
+		stats = self.attributes['stats']
+		if not statID in stats:
 			stats[statID] = Stat(current=value, max=max, min=min)
 		else:
 			raise Exception('Can not add stat "%s", it already exists!' % statID)	
@@ -33,7 +33,7 @@ class Traitful(object):
 
 	def setStat(self, statID, value):
 		old = self.getStat(statID)
-		result = self.getAttribute('stats')[statID].set(value)
+		result = self.attributes['stats'][statID].set(value)
 		data = {'stat': statID, 'current': self.getStat(statID), 'previous': old}
 		if result:
 			self.trigger('change-stat-base %s' % statID, data)
@@ -43,7 +43,7 @@ class Traitful(object):
 			return False
 
 	def getStat(self, statID):
-		stat = self.getAttribute('stats').get(statID, None)
+		stat = self.attributes['stats'].get(statID, None)
 		c = self.getBaseStat(statID)
 		# Apply all modifiers to the stat
 		for mod in self.statModifiers:
@@ -52,7 +52,7 @@ class Traitful(object):
 		return c
 
 	def getBaseStat(self, statID):
-		stat = self.getAttribute('stats').get(statID, None)
+		stat = self.attributes['stats'].get(statID, None)
 		if not stat is None:
 			c = stat.current
 			return c
@@ -61,11 +61,11 @@ class Traitful(object):
 
 
 	def getStats(self):
-		return self.getAttribute('stats')
+		return self.attributes['stats']
 
 	def removeStat(self, statID):
 		self.trigger('remove-stat %s' % statID)
-		self.getAttribute('stats').remove(statID)
+		self.attributes['stats'].remove(statID)
 
 	def addReaction(self, event, action):
 		self.events[event.id] = event

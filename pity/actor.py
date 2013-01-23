@@ -16,7 +16,8 @@ class Actor(Stateful, Traitful, Animated):
 				'h': 10,
 				'forceX': 0,
 				'forceY': 0,
-				'flipped': False
+				'flipped': False,
+				'hidden': False
 			}
 		else:
 			self.attributes = attributes

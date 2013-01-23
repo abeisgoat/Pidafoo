@@ -60,7 +60,7 @@ class Existence(Bindable):
 
 			if not a.trash:
 				if not a.prioritizedInteractions:
-					a.prioritizedInteractions = sorted(a.getAttribute('interactions'), key=interactionKey)
+					a.prioritizedInteractions = sorted(a.attributes['interactions'], key=interactionKey)
 
 				for interaction in a.prioritizedInteractions:
 					if not interaction in a.parsedInteractions:
@@ -90,7 +90,7 @@ class Existence(Bindable):
 									others = []
 									for actor in self.actors:
 										a = self.getActor(actor)
-										if a.getAttribute(selector) == value:
+										if a.attributes[selector] == value:
 											others.append(a)
 									self.__selectors_cache__[selectorKey] = others
 
@@ -118,7 +118,7 @@ class Existence(Bindable):
 		self.effects.step()
 
 	def interactOn(self, actor, action, relative_point):
-		point = [actor.getAttribute('x')+relative_point[0], actor.getAttribute('y')+relative_point[1], 1, 1]
+		point = [actor.attributes['x']+relative_point[0], attributes['y']+relative_point[1], 1, 1]
 		others = []
 		for actorID in self.actors:
 			other = self.getActor(actorID)
