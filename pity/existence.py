@@ -118,7 +118,7 @@ class Existence(Bindable):
 		self.effects.step()
 
 	def interactOn(self, actor, action, relative_point):
-		point = [actor.attributes['x']+relative_point[0], attributes['y']+relative_point[1], 1, 1]
+		point = [actor.attributes['x']+relative_point[0], actor.attributes['y']+relative_point[1], 1, 1]
 		others = []
 		for actorID in self.actors:
 			other = self.getActor(actorID)
