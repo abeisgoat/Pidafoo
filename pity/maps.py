@@ -67,12 +67,13 @@ class Map(object):
 		actors = {}
 		if not actorType:
 			actorType = Actor
+
 		for by, row in enumerate( grid.getArray() ):
 			for bx,block in enumerate( row ):
-				y = by + gridOffset[1]
-				x = bx + gridOffset[0]
+				y = by
+				x = bx
 
-				aid = prefix + '-%ix%ix%i' % (x, y, int(layer))
+				aid = prefix + '-%ix%ix%i' % (x+gridOffset[0], y+gridOffset[1], int(layer))
 
 				#if block in self.actors:
 				#	self.actors.pop(block)
@@ -222,7 +223,7 @@ class Map(object):
 
 		print 'Preparing new map segment'
 		chunkRange = len(range(self.activeChunkX-self.chunkRange, self.activeChunkX+self.chunkRange+1))
-		segment = Grid(width=(chunkRange*self.chunkSize)+11, height=(chunkRange*self.chunkSize)+12)
+		segment = Grid(width=((chunkRange+1)*self.chunkSize), height=((chunkRange+1)*self.chunkSize))
 		self.chunkRangeActors = {}
 
 		print 'Setting up segment'
@@ -250,7 +251,8 @@ class Map(object):
 			print 'Generating new actors for layer %s' % layer
 			if layer is '0': print segment
 			baseOffset = [((baseX-xplus)*self.chunkSize*self.blockSize), ((baseY-yplus)*self.chunkSize*self.blockSize)]
-			actors = self.gridToActors(segment, layer=int(layer), offset=baseOffset)#, gridOffset=[-x_diff, -y_diff])
+			print (baseX-xplus)*self.chunkSize, (baseY-yplus)*self.chunkSize, 
+			actors = self.gridToActors(segment, layer=int(layer), offset=baseOffset, gridOffset=[(baseX-xplus)*self.chunkSize, (baseY-yplus)*self.chunkSize])#, gridOffset=[-x_diff, -y_diff])
 			self.chunkRangeActors.update(actors)
 		return True
 
